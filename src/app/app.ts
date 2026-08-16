@@ -1,4 +1,4 @@
-// app.component.ts - Version complète avec toutes les fonctionnalités
+// app.component.ts - Version complète et corrigée
 import { CommonModule } from '@angular/common';
 import { Component, effect, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -63,7 +63,6 @@ import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-previ
     MatBadgeModule,
     MatTooltipModule,
     ExcalidrawPreviewComponent,
-    ExportDialogComponent,
   ],
   template: `
     <div class="app-container">
@@ -160,7 +159,10 @@ import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-previ
 
                 <mat-form-field appearance="outline" class="category-field">
                   <mat-label>Catégorie</mat-label>
-                  <mat-select [(ngModel)]="filterCategory" (selectionChange)="onFilterChange()">
+                  <mat-select
+                    [(ngModel)]="selectedFilterCategory"
+                    (selectionChange)="onFilterChange()"
+                  >
                     <mat-option value="all">Toutes</mat-option>
                     @for (category of getCategories(); track category) {
                       <mat-option [value]="category">{{ category }}</mat-option>
@@ -268,7 +270,10 @@ import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-previ
                 <div class="preview-controls">
                   <mat-form-field appearance="fill">
                     <mat-label>Type de prévisualisation</mat-label>
-                    <mat-select [(ngModel)]="previewMode" (selectionChange)="updatePreview()">
+                    <mat-select
+                      [(ngModel)]="previewMode"
+                      (selectionChange)="onPreviewModeChange($event)"
+                    >
                       <mat-option value="single">Élément unique</mat-option>
                       <mat-option value="multiple">Plusieurs éléments</mat-option>
                       <mat-option value="library">Bibliothèque complète</mat-option>
@@ -280,7 +285,7 @@ import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-previ
                       <mat-label>Sélectionner un élément</mat-label>
                       <mat-select
                         [(ngModel)]="selectedPreviewComponent"
-                        (selectionChange)="updatePreview()"
+                        (selectionChange)="onPreviewComponentChange($event)"
                       >
                         @for (component of availableComponents; track component.type) {
                           <mat-option [value]="component.type">
@@ -684,7 +689,7 @@ export class AppComponent {
     { name: 'Ecosystem', selected: true, color: '#8BC34A' },
   ]);
 
-  // Nouvelles propriétés pour la prévisualisation
+  // Propriétés pour la prévisualisation
   previewMode = 'library';
   selectedPreviewComponent = ComponentType.STANDALONE_COMPONENT;
   previewGroup: ExcalidrawGroup | null = null;
@@ -742,7 +747,15 @@ export class AppComponent {
 
   previewTemplate(template: ArchitectureTemplate) {
     console.log('Prévisualisation du template:', template);
-    // Implémenter la prévisualisation du template
+    try {
+      const library = this.generatorService.generateArchitectureTemplate(template.id);
+      this.previewLibrary = library;
+      this.previewMode = 'library';
+      this.updatePreview();
+    } catch (error) {
+      console.error('Erreur lors de la prévisualisation du template:', error);
+      this.showSnackBar('Erreur lors de la prévisualisation', 'error');
+    }
   }
 
   exportLibrary() {
@@ -770,7 +783,6 @@ export class AppComponent {
   }
 
   importLibrary() {
-    // Déclencher le file input
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     if (fileInput) {
       fileInput.click();
@@ -785,7 +797,6 @@ export class AppComponent {
       this.fileExportService
         .importFromJSON(file)
         .then((library) => {
-          // Mettre à jour la bibliothèque dans le service
           this.generatorService['_currentLibrary'].set(library);
           this.showSnackBar(`Bibliothèque importée: ${library.libraryItems.length} éléments`);
         })
@@ -796,23 +807,15 @@ export class AppComponent {
     }
   }
 
-  filterCategory(category: string) {
-    this.selectedCategory.set(category);
-    this.generatorService.filterByCategory(category);
-  }
-
-  // RENOMMÉ : filterLibraryCategory -> applyLibraryFilter
   applyLibraryFilter(category: string) {
     this.selectedCategory.set(category);
     this.generatorService.filterByCategory(category);
   }
 
-  // NOUVEAU : Méthode pour gérer le changement de filtre
   onFilterChange(): void {
     this.applyLibraryFilter(this.selectedFilterCategory());
   }
 
-  // RENOMMÉ : getFilteredComponents utilise maintenant selectedFilterCategory
   getFilteredComponents() {
     const search = this.searchTerm().toLowerCase();
     const category = this.selectedFilterCategory();
@@ -852,7 +855,6 @@ export class AppComponent {
       const group = this.generatorService.generateComponentByType(component.type);
       console.log('Composant généré:', group);
       this.showSnackBar(`Composant ajouté: ${component.defaultName}`);
-      // Ici, vous pouvez ajouter le groupe à la bibliothèque
     } catch (error) {
       console.error("Erreur lors de l'ajout:", error);
       this.showSnackBar("Erreur lors de l'ajout du composant", 'error');
@@ -867,14 +869,15 @@ export class AppComponent {
       this.previewMode = 'single';
       this.selectedPreviewComponent = component.type;
       this.updatePreview();
+      this.showSnackBar(`Aperçu: ${component.defaultName}`);
     } catch (error) {
       console.error('Erreur de prévisualisation:', error);
+      this.showSnackBar('Erreur lors de la prévisualisation', 'error');
     }
   }
 
   removeItem(itemId: string) {
     console.log('Suppression:', itemId);
-    // Implémenter la suppression
     this.showSnackBar('Élément supprimé');
   }
 
@@ -930,20 +933,26 @@ export class AppComponent {
     }
   }
 
-  changePreviewMode(mode: string): void {
-    this.previewMode = mode;
+  onPreviewModeChange(event: any): void {
+    this.previewMode = event.value || event;
     this.updatePreview();
   }
 
-  // Gestion des favoris
+  onPreviewComponentChange(event: any): void {
+    this.selectedPreviewComponent = event.value || event;
+    this.updatePreview();
+  }
+
   addToFavorites(component: any) {
     const current = this._favorites();
     const index = current.indexOf(component.type);
 
     if (index > -1) {
       this._favorites.set(current.filter((f) => f !== component.type));
+      this.showSnackBar(`Retiré des favoris: ${component.defaultName}`);
     } else {
       this._favorites.set([...current, component.type]);
+      this.showSnackBar(`Ajouté aux favoris: ${component.defaultName}`);
     }
   }
 
@@ -955,7 +964,6 @@ export class AppComponent {
     return this.selectedPreviewComponent === component.type;
   }
 
-  // Helpers
   getComponentCategory(type: ComponentType): ComponentCategory {
     return getComponentCategory(type);
   }

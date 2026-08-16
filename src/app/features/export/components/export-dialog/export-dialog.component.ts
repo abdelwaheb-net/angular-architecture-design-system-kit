@@ -1,6 +1,6 @@
-// export-dialog.component.ts
+// export-dialog.component.ts - Version corrigée avec @Input
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -50,7 +50,11 @@ export type ExportFormat = 'json' | 'text' | 'csv';
         <div class="info">
           <p>
             <mat-icon>info</mat-icon>
-            {{ library.libraryItems.length }} éléments seront exportés
+            @if (library) {
+              {{ library.libraryItems.length }} éléments seront exportés
+            } @else {
+              Aucune bibliothèque à exporter
+            }
           </p>
         </div>
       </div>
@@ -58,7 +62,7 @@ export type ExportFormat = 'json' | 'text' | 'csv';
 
     <mat-dialog-actions align="end">
       <button mat-button (click)="onCancel()">Annuler</button>
-      <button mat-raised-button color="primary" (click)="onExport()">
+      <button mat-raised-button color="primary" (click)="onExport()" [disabled]="!library">
         <mat-icon>download</mat-icon> Exporter
       </button>
     </mat-dialog-actions>
@@ -98,20 +102,33 @@ export type ExportFormat = 'json' | 'text' | 'csv';
   ],
 })
 export class ExportDialogComponent {
+  // Ajouter @Input pour permettre la liaison depuis le template
+  @Input() library: ExcalidrawLibrary | null = null;
+
   filename = 'angular-architecture-kit.excalidrawlib';
   format: ExportFormat = 'json';
 
   constructor(
     public dialogRef: MatDialogRef<ExportDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public library: ExcalidrawLibrary,
+    @Inject(MAT_DIALOG_DATA) private data: ExcalidrawLibrary,
     private fileExportService: FileExportService,
-  ) {}
+  ) {
+    // Si des données sont passées via MatDialog, les utiliser
+    if (data) {
+      this.library = data;
+    }
+  }
 
   onCancel(): void {
     this.dialogRef.close();
   }
 
   onExport(): void {
+    if (!this.library) {
+      console.warn('Aucune bibliothèque à exporter');
+      return;
+    }
+
     const finalFilename = this.getFinalFilename();
 
     switch (this.format) {

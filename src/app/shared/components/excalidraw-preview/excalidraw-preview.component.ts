@@ -1,4 +1,4 @@
-// excalidraw-preview.component.ts - Version corrigée avec zoom
+// excalidraw-preview.component.ts - Version corrigée
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   AfterViewInit,
@@ -30,7 +30,7 @@ import { CanvasRendererService } from '../../../core/services/canvas-renderer.se
             mat-icon-button
             matTooltip="Zoom avant"
             (click)="zoomIn()"
-            [disabled]="!isBrowser"
+            [disabled]="!isBrowser || !hasContent"
           >
             <mat-icon>zoom_in</mat-icon>
           </button>
@@ -38,7 +38,7 @@ import { CanvasRendererService } from '../../../core/services/canvas-renderer.se
             mat-icon-button
             matTooltip="Zoom arrière"
             (click)="zoomOut()"
-            [disabled]="!isBrowser"
+            [disabled]="!isBrowser || !hasContent"
           >
             <mat-icon>zoom_out</mat-icon>
           </button>
@@ -46,7 +46,7 @@ import { CanvasRendererService } from '../../../core/services/canvas-renderer.se
             mat-icon-button
             matTooltip="Réinitialiser"
             (click)="resetZoom()"
-            [disabled]="!isBrowser"
+            [disabled]="!isBrowser || !hasContent"
           >
             <mat-icon>fit_screen</mat-icon>
           </button>
@@ -54,30 +54,32 @@ import { CanvasRendererService } from '../../../core/services/canvas-renderer.se
             mat-icon-button
             matTooltip="Exporter en PNG"
             (click)="exportPNG()"
-            [disabled]="!isBrowser"
+            [disabled]="!isBrowser || !hasContent"
           >
             <mat-icon>image</mat-icon>
           </button>
         </div>
       </div>
 
-      <div class="canvas-wrapper" #canvasWrapper>
+      <div
+        class="canvas-wrapper"
+        #canvasWrapper
+        style="width: 100%; height: 500px; position: relative;"
+      >
         @if (isBrowser) {
-          <canvas #previewCanvas></canvas>
-        } @else {
-          <div class="ssr-placeholder">
+          <canvas
+            #previewCanvas
+            style="width: 100%; height: 100%; display: block; border: 1px solid #ddd;"
+          ></canvas>
+        }
+
+        @if (!hasContent) {
+          <div class="empty-preview">
             <mat-icon>image</mat-icon>
-            <p>Prévisualisation disponible uniquement dans le navigateur</p>
+            <p>Sélectionnez un composant ou générez une bibliothèque</p>
           </div>
         }
       </div>
-
-      @if (!hasContent && isBrowser) {
-        <div class="empty-preview">
-          <mat-icon>image</mat-icon>
-          <p>Aucun élément à prévisualiser</p>
-        </div>
-      }
     </div>
   `,
   styles: [
@@ -129,8 +131,7 @@ import { CanvasRendererService } from '../../../core/services/canvas-renderer.se
         transition: transform 0.2s ease;
       }
 
-      .empty-preview,
-      .ssr-placeholder {
+      .empty-preview {
         position: absolute;
         top: 50%;
         left: 50%;
@@ -178,27 +179,50 @@ export class ExcalidrawPreviewComponent implements AfterViewInit, OnChanges {
 
   ngAfterViewInit(): void {
     if (this.isBrowser && this.canvasRef) {
-      this.canvasRenderer.initializeCanvas(this.canvasRef);
-      this.renderContent();
+      setTimeout(() => {
+        this.canvasRenderer.initializeCanvas(this.canvasRef);
+        this.renderContent();
+      }, 500);
     }
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.isBrowser && this.canvasRef) {
-      this.renderContent();
+    // Vérifier si les inputs ont changé
+    if (changes['group'] || changes['library'] || changes['groups']) {
+      console.log('Inputs changés:', {
+        group: this.group ? 'présent' : 'null',
+        library: this.library ? this.library.libraryItems.length + ' items' : 'null',
+        groups: this.groups.length + ' groups',
+      });
+
+      if (this.isBrowser && this.canvasRef) {
+        setTimeout(() => {
+          this.renderContent();
+        }, 200);
+      }
     }
+
   }
 
   private renderContent(): void {
-    if (!this.isBrowser) return;
+    if (!this.isBrowser || !this.canvasRef) {
+      console.warn('Canvas non disponible');
+      return;
+    }
+
+    console.log('Rendu du contenu...');
 
     if (this.group) {
+      console.log('Rendu du groupe:', this.group.name);
       this.canvasRenderer.renderGroup(this.group);
       this.hasContent = true;
-    } else if (this.groups.length > 0) {
+    } else if (this.groups && this.groups.length > 0) {
+      console.log('Rendu de', this.groups.length, 'groupes');
       this.canvasRenderer.renderLibrary(this.groups);
       this.hasContent = true;
-    } else if (this.library) {
+    } else if (this.library && this.library.libraryItems.length > 0) {
+      console.log('Rendu de la bibliothèque:', this.library.libraryItems.length, 'items');
       const groups = this.library.libraryItems.map((item) => ({
         name: item.id,
         elements: item.elements,
@@ -207,24 +231,25 @@ export class ExcalidrawPreviewComponent implements AfterViewInit, OnChanges {
       this.canvasRenderer.renderLibrary(groups);
       this.hasContent = true;
     } else {
+      console.log('Aucun contenu à rendre');
       this.hasContent = false;
     }
   }
 
   zoomIn(): void {
-    if (!this.isBrowser) return;
+    if (!this.isBrowser || !this.hasContent) return;
     this.zoomLevel = Math.min(this.zoomLevel + this.zoomStep, this.maxZoom);
     this.applyZoom();
   }
 
   zoomOut(): void {
-    if (!this.isBrowser) return;
+    if (!this.isBrowser || !this.hasContent) return;
     this.zoomLevel = Math.max(this.zoomLevel - this.zoomStep, this.minZoom);
     this.applyZoom();
   }
 
   resetZoom(): void {
-    if (!this.isBrowser) return;
+    if (!this.isBrowser || !this.hasContent) return;
     this.zoomLevel = 1;
     this.applyZoom();
   }
@@ -239,7 +264,7 @@ export class ExcalidrawPreviewComponent implements AfterViewInit, OnChanges {
   }
 
   exportPNG(): void {
-    if (!this.isBrowser) return;
+    if (!this.isBrowser || !this.hasContent) return;
 
     const dataUrl = this.canvasRenderer.exportToPNG();
     if (!dataUrl) return;
@@ -249,4 +274,9 @@ export class ExcalidrawPreviewComponent implements AfterViewInit, OnChanges {
     link.download = 'preview.png';
     link.click();
   }
+
+  // Dans ExcalidrawPreviewComponent
+
+
+
 }

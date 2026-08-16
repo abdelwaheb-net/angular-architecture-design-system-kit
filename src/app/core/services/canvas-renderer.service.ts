@@ -1,4 +1,4 @@
-// canvas-renderer.service.ts - Version compatible SSR
+// canvas-renderer.service.ts - Version complètement corrigée
 import { isPlatformBrowser } from '@angular/common';
 import { ElementRef, Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { ExcalidrawElement, ExcalidrawGroup } from '../models/excalidraw-element.model';
@@ -9,7 +9,6 @@ import { ExcalidrawElement, ExcalidrawGroup } from '../models/excalidraw-element
 export class CanvasRendererService {
   private canvas!: HTMLCanvasElement;
   private ctx!: CanvasRenderingContext2D;
-  private scale = 1;
   private offsetX = 0;
   private offsetY = 0;
   private isBrowser: boolean;
@@ -19,139 +18,156 @@ export class CanvasRendererService {
   }
 
   /**
-   * Initialise le canvas
+   * Initialise le canvas avec des dimensions explicites
    */
   initializeCanvas(canvasRef: ElementRef<HTMLCanvasElement>): void {
-    // Vérifier si on est dans un navigateur
     if (!this.isBrowser) {
       console.warn('Canvas non disponible côté serveur');
       return;
     }
 
     this.canvas = canvasRef.nativeElement;
-    const context = this.canvas.getContext('2d');
 
+    // Forcer des dimensions explicites
+    const parent = this.canvas.parentElement;
+    if (parent) {
+      const rect = parent.getBoundingClientRect();
+      console.log('Dimensions du parent:', rect.width, 'x', rect.height);
+
+      this.canvas.width = rect.width || 800;
+      this.canvas.height = rect.height || 600;
+
+      // Aussi définir les styles CSS
+      this.canvas.style.width = `${this.canvas.width}px`;
+      this.canvas.style.height = `${this.canvas.height}px`;
+    } else {
+      // Dimensions par défaut
+      this.canvas.width = 800;
+      this.canvas.height = 600;
+      this.canvas.style.width = '800px';
+      this.canvas.style.height = '600px';
+    }
+
+    const context = this.canvas.getContext('2d');
     if (!context) {
-      console.error("Impossible d'obtenir le contexte 2D du canvas");
+      console.error("Impossible d'obtenir le contexte 2D");
       return;
     }
 
     this.ctx = context;
-    this.resizeCanvas();
-  }
-
-  /**
-   * Redimensionne le canvas
-   */
-  private resizeCanvas(): void {
-    if (!this.isBrowser || !this.canvas) return;
-
-    const rect = this.canvas.parentElement?.getBoundingClientRect();
-    if (rect) {
-      this.canvas.width = rect.width;
-      this.canvas.height = rect.height;
-    }
+    console.log('Canvas initialisé avec dimensions:', this.canvas.width, 'x', this.canvas.height);
   }
 
   /**
    * Rend un groupe Excalidraw
    */
   renderGroup(group: ExcalidrawGroup): void {
-    if (!this.isBrowser || !this.ctx) return;
+    if (!this.isBrowser || !this.ctx || !this.canvas) {
+      console.error('Canvas non initialisé pour le rendu');
+      return;
+    }
 
+    console.log('Rendu du groupe:', group.name);
+
+    // Nettoyer le canvas
     this.clearCanvas();
-    this.drawGrid();
 
-    const elements = group.elements;
-    const bounds = this.calculateBounds(elements);
+    // Dessiner un fond blanc
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // Centrer le groupe
-    this.offsetX = (this.canvas.width - bounds.width) / 2 - bounds.minX;
-    this.offsetY = (this.canvas.height - bounds.height) / 2 - bounds.minY;
+    // Calculer les dimensions du groupe
+    const bounds = this.calculateBounds(group.elements);
+    console.log('Bounds du groupe:', bounds);
 
-    // Dessiner chaque élément
-    elements.forEach((element) => {
-      this.drawElement(element);
+    // Calculer l'échelle pour que tout soit visible
+    const scaleX = (this.canvas.width - 100) / bounds.width;
+    const scaleY = (this.canvas.height - 100) / bounds.height;
+    const scale = Math.min(scaleX, scaleY, 2); // Ne pas zoomer plus de 2x
+
+    console.log('Échelle de rendu:', scale);
+
+    // Centrer le groupe avec l'échelle
+    this.offsetX = (this.canvas.width - bounds.width * scale) / 2 - bounds.minX * scale;
+    this.offsetY = (this.canvas.height - bounds.height * scale) / 2 - bounds.minY * scale;
+
+    // Dessiner chaque élément avec l'échelle
+    group.elements.forEach((element) => {
+      this.drawElement(element, scale);
     });
+
+    console.log('Rendu terminé');
   }
 
   /**
    * Rend une bibliothèque complète
    */
   renderLibrary(groups: ExcalidrawGroup[]): void {
-    if (!this.isBrowser || !this.ctx) return;
+    if (!this.isBrowser || !this.ctx || !this.canvas) return;
 
     this.clearCanvas();
-    this.drawGrid();
 
     const spacing = 50;
-    let currentY = 50;
-    let currentX = 50;
-    const maxWidth = this.canvas.width - 100;
+    let currentY = 20;
+    const currentX = 20;
+    const maxWidth = this.canvas.width - 40;
 
     groups.forEach((group) => {
       const bounds = this.calculateBounds(group.elements);
+      const scale = Math.min(1, maxWidth / bounds.width);
 
-      // Vérifier si on doit passer à la ligne
-      if (currentX + bounds.width > maxWidth) {
-        currentX = 50;
-        currentY += bounds.height + spacing;
-      }
+      this.offsetX = currentX - bounds.minX * scale;
+      this.offsetY = currentY - bounds.minY * scale;
 
-      this.offsetX = currentX - bounds.minX;
-      this.offsetY = currentY - bounds.minY;
-
-      // Dessiner le groupe
       group.elements.forEach((element) => {
-        this.drawElement(element);
+        this.drawElement(element, scale);
       });
 
-      // Dessiner le nom du groupe
-      this.drawLabel(group.name, currentX, currentY - 20);
+      this.drawLabel(group.name, currentX, currentY - 10);
 
-      currentX += bounds.width + spacing;
+      currentY += bounds.height * scale + spacing;
     });
   }
 
   /**
-   * Dessine un élément Excalidraw
+   * Dessine un élément avec échelle
    */
-  private drawElement(element: ExcalidrawElement): void {
-    if (!this.isBrowser || !this.ctx) return;
+  private drawElement(element: ExcalidrawElement, scale: number = 1): void {
+    if (!this.ctx) return;
 
     const ctx = this.ctx;
-    const x = element.x + this.offsetX;
-    const y = element.y + this.offsetY;
+    const x = element.x * scale + this.offsetX;
+    const y = element.y * scale + this.offsetY;
 
     ctx.save();
     ctx.strokeStyle = element.strokeColor;
-    ctx.lineWidth = element.strokeWidth;
+    ctx.lineWidth = (element.strokeWidth || 2) * scale;
     ctx.globalAlpha = (element.opacity || 100) / 100;
 
     if (element.strokeStyle === 'dashed') {
-      ctx.setLineDash([5, 5]);
+      ctx.setLineDash([5 * scale, 5 * scale]);
     } else if (element.strokeStyle === 'dotted') {
-      ctx.setLineDash([2, 2]);
+      ctx.setLineDash([2 * scale, 2 * scale]);
     }
 
     switch (element.type) {
       case 'rectangle':
-        this.drawRectangle(x, y, element);
+        this.drawRectangle(x, y, element, scale);
         break;
       case 'ellipse':
-        this.drawEllipse(x, y, element);
+        this.drawEllipse(x, y, element, scale);
         break;
       case 'diamond':
-        this.drawDiamond(x, y, element);
+        this.drawDiamond(x, y, element, scale);
         break;
       case 'text':
-        this.drawText(x, y, element);
+        this.drawText(x, y, element, scale);
         break;
       case 'arrow':
-        this.drawArrow(x, y, element);
+        this.drawArrow(x, y, element, scale);
         break;
       case 'line':
-        this.drawLine(x, y, element);
+        this.drawLine(x, y, element, scale);
         break;
     }
 
@@ -161,18 +177,20 @@ export class CanvasRendererService {
   /**
    * Dessine un rectangle
    */
-  private drawRectangle(x: number, y: number, element: ExcalidrawElement): void {
-    if (!this.isBrowser || !this.ctx || !element.width || !element.height) return;
+  private drawRectangle(x: number, y: number, element: ExcalidrawElement, scale: number): void {
+    if (!this.ctx || !element.width || !element.height) return;
 
     const ctx = this.ctx;
-    const radius = element.roundness?.value || 0;
+    const width = element.width * scale;
+    const height = element.height * scale;
+    const radius = (element.roundness?.value || 0) * scale;
 
     ctx.beginPath();
 
     if (radius > 0) {
-      this.roundRect(ctx, x, y, element.width, element.height, radius);
+      this.roundRect(ctx, x, y, width, height, radius);
     } else {
-      ctx.rect(x, y, element.width, element.height);
+      ctx.rect(x, y, width, height);
     }
 
     if (element.backgroundColor) {
@@ -208,20 +226,15 @@ export class CanvasRendererService {
   /**
    * Dessine une ellipse
    */
-  private drawEllipse(x: number, y: number, element: ExcalidrawElement): void {
-    if (!this.isBrowser || !this.ctx || !element.width || !element.height) return;
+  private drawEllipse(x: number, y: number, element: ExcalidrawElement, scale: number): void {
+    if (!this.ctx || !element.width || !element.height) return;
 
     const ctx = this.ctx;
+    const width = element.width * scale;
+    const height = element.height * scale;
+
     ctx.beginPath();
-    ctx.ellipse(
-      x + element.width / 2,
-      y + element.height / 2,
-      element.width / 2,
-      element.height / 2,
-      0,
-      0,
-      Math.PI * 2,
-    );
+    ctx.ellipse(x + width / 2, y + height / 2, width / 2, height / 2, 0, 0, Math.PI * 2);
 
     if (element.backgroundColor) {
       ctx.fillStyle = element.backgroundColor;
@@ -234,15 +247,18 @@ export class CanvasRendererService {
   /**
    * Dessine un diamant
    */
-  private drawDiamond(x: number, y: number, element: ExcalidrawElement): void {
-    if (!this.isBrowser || !this.ctx || !element.width || !element.height) return;
+  private drawDiamond(x: number, y: number, element: ExcalidrawElement, scale: number): void {
+    if (!this.ctx || !element.width || !element.height) return;
 
     const ctx = this.ctx;
+    const width = element.width * scale;
+    const height = element.height * scale;
+
     ctx.beginPath();
-    ctx.moveTo(x + element.width / 2, y);
-    ctx.lineTo(x + element.width, y + element.height / 2);
-    ctx.lineTo(x + element.width / 2, y + element.height);
-    ctx.lineTo(x, y + element.height / 2);
+    ctx.moveTo(x + width / 2, y);
+    ctx.lineTo(x + width, y + height / 2);
+    ctx.lineTo(x + width / 2, y + height);
+    ctx.lineTo(x, y + height / 2);
     ctx.closePath();
 
     if (element.backgroundColor) {
@@ -256,11 +272,12 @@ export class CanvasRendererService {
   /**
    * Dessine du texte
    */
-  private drawText(x: number, y: number, element: ExcalidrawElement): void {
-    if (!this.isBrowser || !this.ctx || !element.text) return;
+  private drawText(x: number, y: number, element: ExcalidrawElement, scale: number): void {
+    if (!this.ctx || !element.text) return;
 
     const ctx = this.ctx;
-    ctx.font = `${element.fontSize || 14}px "Virgil", "Segoe UI", sans-serif`;
+    const fontSize = (element.fontSize || 14) * scale;
+    ctx.font = `${fontSize}px "Virgil", "Segoe UI", sans-serif`;
     ctx.fillStyle = element.strokeColor;
     ctx.textBaseline = 'top';
     ctx.fillText(element.text, x, y);
@@ -269,37 +286,37 @@ export class CanvasRendererService {
   /**
    * Dessine une flèche
    */
-  private drawArrow(x: number, y: number, element: ExcalidrawElement): void {
-    if (!this.isBrowser || !this.ctx || !element.points) return;
+  private drawArrow(x: number, y: number, element: ExcalidrawElement, scale: number): void {
+    if (!this.ctx || !element.points) return;
 
     const ctx = this.ctx;
     ctx.beginPath();
     ctx.moveTo(x, y);
 
     element.points.forEach((point) => {
-      ctx.lineTo(x + point[0], y + point[1]);
+      ctx.lineTo(x + point[0] * scale, y + point[1] * scale);
     });
 
     ctx.stroke();
 
     // Dessiner la pointe de flèche
     const lastPoint = element.points[element.points.length - 1];
-    const prevPoint = element.points[element.points.length - 2] || [x, y];
+    const prevPoint = element.points[element.points.length - 2] || [0, 0];
     const angle = Math.atan2(
-      y + lastPoint[1] - (y + prevPoint[1]),
-      x + lastPoint[0] - (x + prevPoint[0]),
+      (lastPoint[1] - prevPoint[1]) * scale,
+      (lastPoint[0] - prevPoint[0]) * scale,
     );
 
-    const arrowSize = 10;
+    const arrowSize = 10 * scale;
     ctx.beginPath();
-    ctx.moveTo(x + lastPoint[0], y + lastPoint[1]);
+    ctx.moveTo(x + lastPoint[0] * scale, y + lastPoint[1] * scale);
     ctx.lineTo(
-      x + lastPoint[0] - arrowSize * Math.cos(angle - Math.PI / 6),
-      y + lastPoint[1] - arrowSize * Math.sin(angle - Math.PI / 6),
+      x + lastPoint[0] * scale - arrowSize * Math.cos(angle - Math.PI / 6),
+      y + lastPoint[1] * scale - arrowSize * Math.sin(angle - Math.PI / 6),
     );
     ctx.lineTo(
-      x + lastPoint[0] - arrowSize * Math.cos(angle + Math.PI / 6),
-      y + lastPoint[1] - arrowSize * Math.sin(angle + Math.PI / 6),
+      x + lastPoint[0] * scale - arrowSize * Math.cos(angle + Math.PI / 6),
+      y + lastPoint[1] * scale - arrowSize * Math.sin(angle + Math.PI / 6),
     );
     ctx.closePath();
     ctx.fillStyle = element.strokeColor;
@@ -309,15 +326,15 @@ export class CanvasRendererService {
   /**
    * Dessine une ligne
    */
-  private drawLine(x: number, y: number, element: ExcalidrawElement): void {
-    if (!this.isBrowser || !this.ctx || !element.points) return;
+  private drawLine(x: number, y: number, element: ExcalidrawElement, scale: number): void {
+    if (!this.ctx || !element.points) return;
 
     const ctx = this.ctx;
     ctx.beginPath();
     ctx.moveTo(x, y);
 
     element.points.forEach((point) => {
-      ctx.lineTo(x + point[0], y + point[1]);
+      ctx.lineTo(x + point[0] * scale, y + point[1] * scale);
     });
 
     ctx.stroke();
@@ -327,7 +344,7 @@ export class CanvasRendererService {
    * Dessine une grille de fond
    */
   private drawGrid(): void {
-    if (!this.isBrowser || !this.ctx) return;
+    if (!this.ctx || !this.canvas) return;
 
     const ctx = this.ctx;
     const gridSize = 20;
@@ -357,7 +374,7 @@ export class CanvasRendererService {
    * Dessine un label
    */
   private drawLabel(text: string, x: number, y: number): void {
-    if (!this.isBrowser || !this.ctx) return;
+    if (!this.ctx) return;
 
     const ctx = this.ctx;
     ctx.save();
@@ -385,10 +402,13 @@ export class CanvasRendererService {
     let maxY = -Infinity;
 
     elements.forEach((element) => {
+      const elementWidth = element.width || 0;
+      const elementHeight = element.height || 0;
+
       minX = Math.min(minX, element.x);
       minY = Math.min(minY, element.y);
-      maxX = Math.max(maxX, element.x + (element.width || 0));
-      maxY = Math.max(maxY, element.y + (element.height || 0));
+      maxX = Math.max(maxX, element.x + elementWidth);
+      maxY = Math.max(maxY, element.y + elementHeight);
     });
 
     return {
@@ -405,8 +425,11 @@ export class CanvasRendererService {
    * Efface le canvas
    */
   clearCanvas(): void {
-    if (!this.isBrowser || !this.ctx || !this.canvas) return;
+    if (!this.ctx || !this.canvas) return;
+
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Fond blanc
     this.ctx.fillStyle = '#ffffff';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
@@ -417,19 +440,5 @@ export class CanvasRendererService {
   exportToPNG(): string {
     if (!this.isBrowser || !this.canvas) return '';
     return this.canvas.toDataURL('image/png');
-  }
-
-  /**
-   * Exporte le canvas en SVG
-   */
-  exportToSVG(): string {
-    if (!this.isBrowser || !this.canvas) return '';
-
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('width', this.canvas.width.toString());
-    svg.setAttribute('height', this.canvas.height.toString());
-
-    // Ici, vous pouvez implémenter l'export SVG complet
-    return new XMLSerializer().serializeToString(svg);
   }
 }
