@@ -1,50 +1,46 @@
-// excalidraw-element.model.ts - Version corrigée
+// excalidraw-element.model.ts - Format exact Excalidraw
 export interface ExcalidrawElement {
   id: string;
   type: 'rectangle' | 'ellipse' | 'diamond' | 'text' | 'arrow' | 'line';
   x: number;
   y: number;
-  width?: number;
-  height?: number;
-  text?: string;
-  fontSize?: number;
-  fontFamily?: number;
+  width: number;
+  height: number;
+  angle: number;
   strokeColor: string;
-  backgroundColor?: string;
-  fillStyle?: 'solid' | 'hachure' | 'cross-hatch' | 'zigzag';
+  backgroundColor: string;
+  fillStyle: 'solid' | 'hachure' | 'cross-hatch' | 'zigzag';
   strokeWidth: number;
-  strokeStyle?: 'solid' | 'dashed' | 'dotted';
-  roughness?: number;
-  opacity?: number;
-  points?: [number, number][];
-  groupIds?: string[];
-  roundness?: {
+  strokeStyle: 'solid' | 'dashed' | 'dotted';
+  roughness: number;
+  opacity: number;
+  groupIds: string[];
+  roundness: {
     type: number;
     value?: number;
   } | null;
-}
+  boundElements: any[] | null;
+  updated: number;
+  link: string | null;
+  locked: boolean;
 
-// Interface pour la création d'éléments (avec x et y optionnels)
-export interface CreateElementProps {
-  id?: string;
-  type: ExcalidrawElement['type'];
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
+  // Propriétés spécifiques au texte
   text?: string;
   fontSize?: number;
   fontFamily?: number;
-  strokeColor?: string;
-  backgroundColor?: string;
-  fillStyle?: ExcalidrawElement['fillStyle'];
-  strokeWidth?: number;
-  strokeStyle?: ExcalidrawElement['strokeStyle'];
-  roughness?: number;
-  opacity?: number;
+  textAlign?: 'left' | 'center' | 'right';
+  verticalAlign?: 'top' | 'middle' | 'bottom';
+  containerId?: string;
+  originalText?: string;
+  lineHeight?: number;
+
+  // Propriétés pour les formes
   points?: [number, number][];
-  groupIds?: string[];
-  roundness?: ExcalidrawElement['roundness'];
+  startBinding?: any;
+  endBinding?: any;
+  lastCommittedPoint?: [number, number] | null;
+  startArrowhead?: 'arrow' | 'bar' | 'dot' | 'triangle' | null;
+  endArrowhead?: 'arrow' | 'bar' | 'dot' | 'triangle' | null;
 }
 
 export interface ExcalidrawGroup {
@@ -65,19 +61,4 @@ export interface ExcalidrawLibrary {
   version: 2;
   source: string;
   libraryItems: LibraryItem[];
-}
-
-export interface ComponentConfig {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
-  icon: string;
-  variant?: string;
-}
-
-export interface CategoryConfig {
-  name: string;
-  selected: boolean;
-  color: string;
 }

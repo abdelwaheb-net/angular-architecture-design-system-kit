@@ -1,18 +1,12 @@
-// library-generator.service.ts - Version complète et corrigée
+// library-generator.service.ts - Version complète
 import { computed, Injectable, signal, Signal } from '@angular/core';
 import { ANGULAR_COLORS, ColorCategory } from '../constants/colors.constants';
 import {
-  COMPONENT_DIMENSIONS,
-  FONT_SIZES,
-  getDimensions
-} from '../constants/dimensions.constants';
-import {
   ComponentCategory,
   ComponentType,
-  getComponentCategory
+  getComponentCategory,
 } from '../models/component-types.enum';
 import {
-  CreateElementProps,
   ExcalidrawElement,
   ExcalidrawGroup,
   ExcalidrawLibrary,
@@ -23,13 +17,11 @@ import {
   providedIn: 'root',
 })
 export class LibraryGeneratorService {
-  // State avec Signals
   private readonly _currentLibrary = signal<ExcalidrawLibrary | null>(null);
   private readonly _selectedCategory = signal<string>('all');
   private readonly _isGenerating = signal<boolean>(false);
   private readonly _elementCounter = signal<number>(0);
 
-  // Computed signals
   readonly currentLibrary: Signal<ExcalidrawLibrary | null> = this._currentLibrary.asReadonly();
   readonly selectedCategory: Signal<string> = this._selectedCategory.asReadonly();
   readonly isGenerating: Signal<boolean> = this._isGenerating.asReadonly();
@@ -55,59 +47,94 @@ export class LibraryGeneratorService {
   constructor() {}
 
   /**
-   * Crée un élément Excalidraw avec ID unique
+   * Crée un élément Excalidraw avec toutes les propriétés requises
    */
-  private createBaseElement(props: CreateElementProps): ExcalidrawElement {
+  private createElement(
+    type: ExcalidrawElement['type'],
+    x: number,
+    y: number,
+    options: Partial<ExcalidrawElement> = {},
+  ): ExcalidrawElement {
     const currentCounter = this._elementCounter();
     this._elementCounter.set(currentCounter + 1);
 
     return {
-      id: props.id || `element-${currentCounter}-${Date.now()}`,
-      type: props.type,
-      x: props.x ?? 0,
-      y: props.y ?? 0,
-      width: props.width,
-      height: props.height,
-      text: props.text,
-      fontSize: props.fontSize,
-      fontFamily: props.fontFamily,
-      strokeColor: props.strokeColor || '#0F0F11',
-      backgroundColor: props.backgroundColor,
-      fillStyle: props.fillStyle || 'solid',
-      strokeWidth: props.strokeWidth || 2,
-      strokeStyle: props.strokeStyle,
-      roughness: props.roughness || 1,
-      opacity: props.opacity || 100,
-      points: props.points,
-      groupIds: props.groupIds,
-      roundness: props.roundness || { type: 3, value: 8 },
+      id: `element-${currentCounter}-${Date.now()}`,
+      type,
+      x,
+      y,
+      width: options.width || 100,
+      height: options.height || 50,
+      angle: 0,
+      strokeColor: options.strokeColor || '#000000',
+      backgroundColor: options.backgroundColor || 'transparent',
+      fillStyle: options.fillStyle || 'solid',
+      strokeWidth: options.strokeWidth || 2,
+      strokeStyle: options.strokeStyle || 'solid',
+      roughness: options.roughness || 1,
+      opacity: options.opacity || 100,
+      groupIds: options.groupIds || [],
+      roundness: options.roundness || null,
+      boundElements: options.boundElements || null,
+      updated: Date.now(),
+      link: options.link || null,
+      locked: options.locked || false,
+      ...options,
     };
   }
 
   /**
-   * Crée un rectangle avec le style Angular
+   * Crée un rectangle Excalidraw
    */
-  private createStyledRectangle(
+  private createRectangle(
     x: number,
     y: number,
     width: number,
     height: number,
     colorCategory: ColorCategory,
-    options: Partial<CreateElementProps> = {},
+    options: Partial<ExcalidrawElement> = {},
   ): ExcalidrawElement {
     const colorScheme = ANGULAR_COLORS[colorCategory];
 
-    return this.createBaseElement({
-      type: 'rectangle',
-      x,
-      y,
+    return this.createElement('rectangle', x, y, {
       width,
       height,
       strokeColor: colorScheme.primary,
       backgroundColor: colorScheme.light,
       fillStyle: 'solid',
       strokeWidth: 2,
+      roughness: 1,
       roundness: { type: 3, value: 8 },
+      ...options,
+    });
+  }
+
+  /**
+   * Crée un texte Excalidraw
+   */
+  private createText(
+    x: number,
+    y: number,
+    text: string,
+    options: Partial<ExcalidrawElement> = {},
+  ): ExcalidrawElement {
+    const fontSize = options.fontSize || 20;
+    const approximateWidth = text.length * fontSize * 0.6;
+
+    return this.createElement('text', x, y, {
+      width: options.width || approximateWidth,
+      height: options.height || fontSize * 1.5,
+      text,
+      fontSize,
+      fontFamily: options.fontFamily || 1,
+      textAlign: options.textAlign || 'left',
+      verticalAlign: options.verticalAlign || 'top',
+      strokeColor: options.strokeColor || '#000000',
+      backgroundColor: 'transparent',
+      fillStyle: 'solid',
+      strokeWidth: 2,
+      roughness: 1,
+      opacity: 100,
       ...options,
     });
   }
@@ -117,55 +144,43 @@ export class LibraryGeneratorService {
    */
   private createGroup(name: string, elements: ExcalidrawElement[]): ExcalidrawGroup {
     const groupId = `group-${name.toLowerCase().replace(/\s+/g, '-')}`;
+
+    const groupedElements = elements.map((el) => ({
+      ...el,
+      groupIds: [groupId],
+    }));
+
     return {
       name,
-      elements: elements.map((el) => ({
-        ...el,
-        groupIds: [groupId],
-      })),
+      elements: groupedElements,
       boundElements: null,
     };
   }
 
   /**
-   * Génère un composant Standalone Angular moderne
+   * Génère un composant Standalone Angular
    */
   generateStandaloneComponent(): ExcalidrawGroup {
     const elements: ExcalidrawElement[] = [];
-    const dimensions = getDimensions('standard');
-    const { width, height, padding } = dimensions;
+    const width = 250;
+    const height = 180;
+    const padding = 20;
 
-    // Rectangle principal
-    elements.push(this.createStyledRectangle(0, 0, width, height, 'components'));
-
-    // Titre
+    elements.push(this.createRectangle(0, 0, width, height, 'components'));
     elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding,
-        y: 10,
-        text: 'Standalone Component',
-        fontSize: FONT_SIZES.title,
-        fontFamily: 1,
+      this.createText(padding, 10, 'Standalone Component', {
+        fontSize: 20,
         strokeColor: ANGULAR_COLORS.components.dark,
       }),
     );
-
-    // Icône
     elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: width - 40,
-        y: 10,
-        text: '📦',
+      this.createText(width - 50, 10, '📦', {
         fontSize: 24,
-        fontFamily: 1,
       }),
     );
 
-    // Badge standalone
     elements.push(
-      this.createStyledRectangle(padding, 40, width - padding * 2, 30, 'components', {
+      this.createRectangle(padding, 50, width - padding * 2, 30, 'components', {
         backgroundColor: '#E8F5E9',
         strokeColor: '#4CAF50',
         roundness: { type: 3, value: 4 },
@@ -174,32 +189,23 @@ export class LibraryGeneratorService {
     );
 
     elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding + 10,
-        y: 48,
-        text: 'standalone: true',
-        fontSize: FONT_SIZES.label,
+      this.createText(padding + 10, 55, 'standalone: true', {
+        fontSize: 14,
         strokeColor: '#2E7D32',
       }),
     );
 
-    // Sections modernes
     const sections = [
-      { label: '📄 template.html', y: 80 },
-      { label: '🎨 styles.scss', y: 100 },
-      { label: '⚡ component.ts', y: 120 },
+      { label: 'template.html', y: 90 },
+      { label: 'styles.scss', y: 115 },
+      { label: 'component.ts', y: 140 },
     ];
 
     sections.forEach((section) => {
       elements.push(
-        this.createBaseElement({
-          type: 'text',
-          x: padding,
-          y: section.y,
-          text: section.label,
-          fontSize: FONT_SIZES.small,
-          strokeColor: '#555',
+        this.createText(padding, section.y, section.label, {
+          fontSize: 12,
+          strokeColor: '#555555',
         }),
       );
     });
@@ -208,53 +214,37 @@ export class LibraryGeneratorService {
   }
 
   /**
-   * Génère un composant avec Signals
+   * Génère un composant Signal
    */
   generateSignalComponent(): ExcalidrawGroup {
     const elements: ExcalidrawElement[] = [];
-    const { width, height, padding } = COMPONENT_DIMENSIONS['standard'];
+    const width = 250;
+    const height = 150;
+    const padding = 20;
 
-    // Rectangle avec style signals
-    elements.push(this.createStyledRectangle(0, 0, width, height, 'signals'));
-
-    // Titre
+    elements.push(this.createRectangle(0, 0, width, height, 'signals'));
     elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding,
-        y: 10,
-        text: 'Signal Component',
-        fontSize: FONT_SIZES.title,
+      this.createText(padding, 10, 'Signal Component', {
+        fontSize: 20,
         strokeColor: ANGULAR_COLORS.signals.dark,
       }),
     );
-
-    // Icône signal
     elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: width - 45,
-        y: 10,
-        text: '⚡',
+      this.createText(width - 50, 10, '⚡', {
         fontSize: 24,
       }),
     );
 
-    // Déclarations de signals
-    const signalDeclarations = [
-      { name: 'count', type: 'signal<number>', y: 45 },
-      { name: 'user', type: 'signal<User | null>', y: 70 },
-      { name: 'isLoading', type: 'signal<boolean>', y: 95 },
+    const signals = [
+      { name: 'count: signal<number>', y: 50 },
+      { name: 'user: signal<User>', y: 75 },
+      { name: 'loading: signal<boolean>', y: 100 },
     ];
 
-    signalDeclarations.forEach((decl) => {
+    signals.forEach((sig) => {
       elements.push(
-        this.createBaseElement({
-          type: 'text',
-          x: padding,
-          y: decl.y,
-          text: `${decl.name}: ${decl.type}`,
-          fontSize: FONT_SIZES.body,
+        this.createText(padding, sig.y, sig.name, {
+          fontSize: 14,
           strokeColor: ANGULAR_COLORS.signals.dark,
         }),
       );
@@ -268,82 +258,39 @@ export class LibraryGeneratorService {
    */
   generateSmartComponent(): ExcalidrawGroup {
     const elements: ExcalidrawElement[] = [];
-    const { width, height, padding } = COMPONENT_DIMENSIONS['standard'];
+    const width = 250;
+    const height = 150;
+    const padding = 20;
 
-    // Rectangle avec bordure épaisse
     elements.push(
-      this.createStyledRectangle(0, 0, width, height, 'components', {
+      this.createRectangle(0, 0, width, height, 'components', {
         strokeWidth: 3,
         backgroundColor: '#FFF0F0',
       }),
     );
 
-    // Titre
     elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding,
-        y: 10,
-        text: 'Smart Component',
-        fontSize: FONT_SIZES.title,
+      this.createText(padding, 10, 'Smart Component', {
+        fontSize: 20,
         strokeColor: ANGULAR_COLORS.components.dark,
       }),
     );
-
-    // Icône cerveau
     elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: width - 45,
-        y: 10,
-        text: '🧠',
+      this.createText(width - 50, 10, '🧠', {
         fontSize: 24,
       }),
     );
 
-    // Inputs
     elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding,
-        y: 45,
-        text: 'Inputs:',
-        fontSize: FONT_SIZES.label,
+      this.createText(padding, 50, '@Input() data', {
+        fontSize: 14,
         strokeColor: '#1565C0',
       }),
     );
-
     elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding + 70,
-        y: 45,
-        text: '@Input() data',
-        fontSize: FONT_SIZES.body,
-        strokeColor: '#333',
-      }),
-    );
-
-    // Services
-    elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding,
-        y: 75,
-        text: 'Services:',
-        fontSize: FONT_SIZES.label,
+      this.createText(padding, 80, 'UserService', {
+        fontSize: 14,
         strokeColor: '#2E7D32',
-      }),
-    );
-
-    elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding + 70,
-        y: 75,
-        text: 'UserService, AuthService',
-        fontSize: FONT_SIZES.body,
-        strokeColor: '#333',
       }),
     );
 
@@ -351,77 +298,43 @@ export class LibraryGeneratorService {
   }
 
   /**
-   * Génère un composant Presentational
+   * Génère un Presentational Component
    */
   generatePresentationalComponent(): ExcalidrawGroup {
     const elements: ExcalidrawElement[] = [];
-    const dimensions = getDimensions('standard');
-    const { width, height, padding } = dimensions;
+    const width = 250;
+    const height = 150;
+    const padding = 20;
 
-    // Rectangle avec bordure pointillée
     elements.push(
-      this.createStyledRectangle(0, 0, width, height, 'components', {
+      this.createRectangle(0, 0, width, height, 'components', {
         strokeColor: '#78909C',
-        strokeWidth: 2,
         backgroundColor: '#FAFAFA',
         strokeStyle: 'dashed',
       }),
     );
 
-    // Titre
     elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding,
-        y: 10,
-        text: 'Presentational',
-        fontSize: FONT_SIZES.title,
+      this.createText(padding, 10, 'Presentational', {
+        fontSize: 20,
         strokeColor: '#546E7A',
       }),
     );
-
-    // Icône palette
     elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: width - 45,
-        y: 10,
-        text: '🎨',
+      this.createText(width - 50, 10, '🎨', {
         fontSize: 24,
       }),
     );
 
-    // Description
     elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding,
-        y: 45,
-        text: 'Pure UI Component',
-        fontSize: FONT_SIZES.subtitle,
+      this.createText(padding, 50, 'Pure UI Component', {
+        fontSize: 16,
         strokeColor: '#78909C',
       }),
     );
-
-    // Inputs/Outputs
     elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding,
-        y: 75,
-        text: '@Input() data',
-        fontSize: FONT_SIZES.body,
-        strokeColor: '#546E7A',
-      }),
-    );
-
-    elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding,
-        y: 95,
-        text: '@Output() event',
-        fontSize: FONT_SIZES.body,
+      this.createText(padding, 80, '@Input() data', {
+        fontSize: 14,
         strokeColor: '#546E7A',
       }),
     );
@@ -430,58 +343,48 @@ export class LibraryGeneratorService {
   }
 
   /**
-   * Génère un composant basé sur son type
+   * Génère un Service Angular
    */
-  // Modifier generateComponentByType pour inclure les nouveaux types
-  generateComponentByType(type: ComponentType): ExcalidrawGroup {
-    switch (type) {
-      case ComponentType.STANDALONE_COMPONENT:
-        return this.generateStandaloneComponent();
-      case ComponentType.SMART_COMPONENT:
-        return this.generateSmartComponent();
-      case ComponentType.PRESENTATIONAL_COMPONENT:
-        return this.generatePresentationalComponent();
-      case ComponentType.SIGNAL_COMPONENT:
-        return this.generateSignalComponent();
-      case ComponentType.INJECTABLE_SERVICE:
-        return this.generateService();
-      case ComponentType.SIGNAL:
-        return this.generateSignal();
-      case ComponentType.SUBJECT:
-        return this.generateSubject();
-      case ComponentType.ROUTE_NODE:
-        return this.generateRoute();
-      case ComponentType.NGRX_STORE:
-        return this.generateNgRxStore();
-      default:
-        throw new Error(`Type de composant non supporté: ${type}`);
-    }
-  }
+  generateService(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 200;
+    const height = 100;
+    const padding = 20;
 
-  /**
-   * Génère tous les composants d'une catégorie
-   */
-  generateByCategory(category: ComponentCategory): ExcalidrawGroup[] {
-    const components: ExcalidrawGroup[] = [];
-
-    // Filtrer les types par catégorie
-    const typesInCategory = Object.values(ComponentType).filter(
-      (type) => getComponentCategory(type) === category,
+    elements.push(this.createRectangle(0, 0, width, height, 'services'));
+    elements.push(
+      this.createText(padding, 10, 'Angular Service', {
+        fontSize: 18,
+        strokeColor: ANGULAR_COLORS.services.dark,
+      }),
+    );
+    elements.push(
+      this.createText(width - 45, 10, '🔧', {
+        fontSize: 20,
+      }),
     );
 
-    typesInCategory.forEach((type) => {
-      try {
-        components.push(this.generateComponentByType(type));
-      } catch (error) {
-        console.warn(`Impossible de générer ${type}:`, error);
-      }
-    });
+    elements.push(
+      this.createRectangle(padding, 50, width - padding * 2, 25, 'services', {
+        backgroundColor: '#E8F5E9',
+        strokeColor: '#4CAF50',
+        roundness: { type: 3, value: 4 },
+        strokeWidth: 1,
+      }),
+    );
 
-    return components;
+    elements.push(
+      this.createText(padding + 10, 53, '@Injectable()', {
+        fontSize: 12,
+        strokeColor: '#2E7D32',
+      }),
+    );
+
+    return this.createGroup('Angular Service', elements);
   }
 
   /**
-   * Génère la bibliothèque de base (composants principaux)
+   * Génère la bibliothèque de base
    */
   generateLibrary(): ExcalidrawLibrary {
     this._isGenerating.set(true);
@@ -510,6 +413,12 @@ export class LibraryGeneratorService {
           id: 'signals-component',
           status: 'published',
           elements: this.generateSignalComponent().elements,
+          created: Date.now(),
+        },
+        {
+          id: 'services-injectable',
+          status: 'published',
+          elements: this.generateService().elements,
           created: Date.now(),
         },
       ];
@@ -542,18 +451,21 @@ export class LibraryGeneratorService {
     try {
       const libraryItems: LibraryItem[] = [];
 
-      // Générer pour chaque catégorie
       Object.values(ComponentCategory).forEach((category) => {
-        const groups = this.generateByCategory(category);
+        try {
+          const groups = this.generateByCategory(category);
 
-        groups.forEach((group) => {
-          libraryItems.push({
-            id: `${category.toLowerCase()}-${group.name.toLowerCase().replace(/\s+/g, '-')}`,
-            status: 'published',
-            elements: group.elements,
-            created: Date.now(),
+          groups.forEach((group) => {
+            libraryItems.push({
+              id: `${category.toLowerCase()}-${group.name.toLowerCase().replace(/\s+/g, '-')}`,
+              status: 'published',
+              elements: group.elements,
+              created: Date.now(),
+            });
           });
-        });
+        } catch (error) {
+          console.warn(`Impossible de générer la catégorie ${category}:`, error);
+        }
       });
 
       const library: ExcalidrawLibrary = {
@@ -573,6 +485,102 @@ export class LibraryGeneratorService {
     } finally {
       this._isGenerating.set(false);
     }
+  }
+
+  /**
+   * Génère un template d'architecture complète
+   */
+  generateArchitectureTemplate(templateName: string): ExcalidrawLibrary {
+    this._isGenerating.set(true);
+
+    try {
+      const templates: Record<string, () => ExcalidrawGroup[]> = {
+        ecommerce: () => [
+          this.generateStandaloneComponent(),
+          this.generateSmartComponent(),
+          this.generateService(),
+        ],
+        dashboard: () => [
+          this.generateStandaloneComponent(),
+          this.generateSignalComponent(),
+          this.generateService(),
+        ],
+        'micro-frontend': () => [this.generateStandaloneComponent(), this.generateService()],
+        'reactive-forms': () => [this.generateStandaloneComponent(), this.generateService()],
+        'real-time': () => [this.generateSignalComponent(), this.generateService()],
+      };
+
+      const generateTemplate = templates[templateName];
+      if (!generateTemplate) {
+        throw new Error(`Template inconnu: ${templateName}`);
+      }
+
+      const groups = generateTemplate();
+      const libraryItems: LibraryItem[] = groups.map((group, index) => ({
+        id: `${templateName}-${index}-${group.name.toLowerCase().replace(/\s+/g, '-')}`,
+        status: 'published',
+        elements: group.elements,
+        created: Date.now(),
+      }));
+
+      const library: ExcalidrawLibrary = {
+        type: 'excalidrawlib',
+        version: 2,
+        source: 'https://github.com/votre-repo/angular-architecture-kit',
+        libraryItems,
+      };
+
+      this._currentLibrary.set(library);
+      console.log(`✅ Template "${templateName}" généré avec ${libraryItems.length} éléments`);
+
+      return library;
+    } catch (error) {
+      console.error('❌ Erreur lors de la génération du template:', error);
+      throw error;
+    } finally {
+      this._isGenerating.set(false);
+    }
+  }
+
+  /**
+   * Génère un composant basé sur son type
+   */
+  generateComponentByType(type: ComponentType): ExcalidrawGroup {
+    switch (type) {
+      case ComponentType.STANDALONE_COMPONENT:
+        return this.generateStandaloneComponent();
+      case ComponentType.SMART_COMPONENT:
+        return this.generateSmartComponent();
+      case ComponentType.PRESENTATIONAL_COMPONENT:
+        return this.generatePresentationalComponent();
+      case ComponentType.SIGNAL_COMPONENT:
+        return this.generateSignalComponent();
+      case ComponentType.INJECTABLE_SERVICE:
+        return this.generateService();
+      default:
+        throw new Error(`Type de composant non supporté: ${type}`);
+    }
+  }
+
+  /**
+   * Génère tous les composants d'une catégorie
+   */
+  generateByCategory(category: ComponentCategory): ExcalidrawGroup[] {
+    const components: ExcalidrawGroup[] = [];
+
+    const typesInCategory = Object.values(ComponentType).filter(
+      (type) => getComponentCategory(type) === category,
+    );
+
+    typesInCategory.forEach((type) => {
+      try {
+        components.push(this.generateComponentByType(type));
+      } catch (error) {
+        console.warn(`Impossible de générer ${type}:`, error);
+      }
+    });
+
+    return components;
   }
 
   /**
@@ -621,383 +629,5 @@ export class LibraryGeneratorService {
     } catch (error) {
       console.error('❌ Erreur lors du téléchargement:', error);
     }
-  }
-
-  // Ajouter ces méthodes dans LibraryGeneratorService
-
-  /**
-   * Génère un Service Angular
-   */
-  generateService(): ExcalidrawGroup {
-    const elements: ExcalidrawElement[] = [];
-    const { width, height, padding } = COMPONENT_DIMENSIONS['service'];
-
-    // Rectangle principal avec style service
-    elements.push(this.createStyledRectangle(0, 0, width, height, 'services'));
-
-    // Titre
-    elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding,
-        y: 10,
-        text: 'Angular Service',
-        fontSize: FONT_SIZES.title,
-        strokeColor: ANGULAR_COLORS.services.dark,
-      }),
-    );
-
-    // Icône
-    elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: width - 40,
-        y: 10,
-        text: '🔧',
-        fontSize: 24,
-      }),
-    );
-
-    // Badge injectable
-    elements.push(
-      this.createStyledRectangle(padding, 40, width - padding * 2, 25, 'services', {
-        backgroundColor: '#E8F5E9',
-        strokeColor: '#4CAF50',
-        roundness: { type: 3, value: 4 },
-        strokeWidth: 1,
-      }),
-    );
-
-    elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding + 10,
-        y: 45,
-        text: '@Injectable()',
-        fontSize: FONT_SIZES.small,
-        strokeColor: '#2E7D32',
-      }),
-    );
-
-    return this.createGroup('Angular Service', elements);
-  }
-
-  /**
-   * Génère un Signal
-   */
-  generateSignal(): ExcalidrawGroup {
-    const elements: ExcalidrawElement[] = [];
-    const { width, height, padding } = COMPONENT_DIMENSIONS['signal'];
-
-    // Ellipse pour le signal
-    elements.push(
-      this.createBaseElement({
-        type: 'ellipse',
-        x: 0,
-        y: 0,
-        width,
-        height,
-        strokeColor: ANGULAR_COLORS.signals.primary,
-        backgroundColor: ANGULAR_COLORS.signals.light,
-        fillStyle: 'solid',
-        strokeWidth: 2,
-      }),
-    );
-
-    // Icône éclair
-    elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: width / 2 - 15,
-        y: height / 2 - 15,
-        text: '⚡',
-        fontSize: 20,
-      }),
-    );
-
-    // Label
-    elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: width / 2 - 20,
-        y: height / 2 + 5,
-        text: 'signal()',
-        fontSize: FONT_SIZES.small,
-        strokeColor: ANGULAR_COLORS.signals.dark,
-      }),
-    );
-
-    return this.createGroup('Signal', elements);
-  }
-
-  /**
-   * Génère un Subject RxJS
-   */
-  generateSubject(): ExcalidrawGroup {
-    const elements: ExcalidrawElement[] = [];
-    const { width, height, padding } = COMPONENT_DIMENSIONS['operator'];
-
-    // Rectangle arrondi pour l'opérateur
-    elements.push(
-      this.createStyledRectangle(0, 0, width, height, 'rxjs', {
-        roundness: { type: 3, value: 12 },
-        backgroundColor: '#FCE4EC',
-      }),
-    );
-
-    // Titre
-    elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding,
-        y: 10,
-        text: 'Subject',
-        fontSize: FONT_SIZES.body,
-        strokeColor: ANGULAR_COLORS.rxjs.dark,
-      }),
-    );
-
-    return this.createGroup('RxJS Subject', elements);
-  }
-
-  /**
-   * Génère une route Angular
-   */
-  generateRoute(): ExcalidrawGroup {
-    const elements: ExcalidrawElement[] = [];
-    const { width, height, padding } = COMPONENT_DIMENSIONS['route'];
-
-    // Rectangle avec style routing
-    elements.push(this.createStyledRectangle(0, 0, width, height, 'routing'));
-
-    // Icône route
-    elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding,
-        y: 10,
-        text: '🛣️',
-        fontSize: 20,
-      }),
-    );
-
-    // Titre
-    elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding + 35,
-        y: 10,
-        text: 'Route',
-        fontSize: FONT_SIZES.body,
-        strokeColor: ANGULAR_COLORS.routing.dark,
-      }),
-    );
-
-    // Path
-    elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding,
-        y: 40,
-        text: '/dashboard',
-        fontSize: FONT_SIZES.small,
-        strokeColor: '#1565C0',
-      }),
-    );
-
-    return this.createGroup('Route Angular', elements);
-  }
-
-  /**
-   * Génère un Store NgRx
-   */
-  generateNgRxStore(): ExcalidrawGroup {
-    const elements: ExcalidrawElement[] = [];
-    const { width, height, padding } = COMPONENT_DIMENSIONS.standard;
-
-    // Rectangle principal
-    elements.push(
-      this.createStyledRectangle(0, 0, width, height, 'architecture', {
-        backgroundColor: '#FFF3E0',
-      }),
-    );
-
-    // Titre
-    elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: padding,
-        y: 10,
-        text: 'NgRx Store',
-        fontSize: FONT_SIZES.title,
-        strokeColor: ANGULAR_COLORS.architecture.dark,
-      }),
-    );
-
-    // Icône
-    elements.push(
-      this.createBaseElement({
-        type: 'text',
-        x: width - 45,
-        y: 10,
-        text: '🏪',
-        fontSize: 24,
-      }),
-    );
-
-    // Sections
-    const storeSections = [
-      { label: 'Actions', icon: '📨', y: 45 },
-      { label: 'Reducers', icon: '🔨', y: 70 },
-      { label: 'Effects', icon: '⚡', y: 95 },
-      { label: 'Selectors', icon: '🔍', y: 120 },
-    ];
-
-    storeSections.forEach((section) => {
-      elements.push(
-        this.createBaseElement({
-          type: 'text',
-          x: padding,
-          y: section.y,
-          text: `${section.icon} ${section.label}`,
-          fontSize: FONT_SIZES.body,
-          strokeColor: '#E65100',
-        }),
-      );
-    });
-
-    return this.createGroup('NgRx Store', elements);
-  }
-  // library-generator.service.ts - Ajouter ces méthodes à la fin de la classe
-
-  /**
-   * SECTION: Export/Import de fichiers
-   */
-
-  /**
-   * Exporte la bibliothèque en fichier JSON téléchargeable
-   */
-  exportLibraryToFile(filename: string = 'angular-architecture-kit.excalidrawlib'): void {
-    const library = this._currentLibrary();
-    if (!library) {
-      console.warn('⚠️ Aucune bibliothèque à exporter');
-      return;
-    }
-
-    const json = JSON.stringify(library, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-
-    console.log(`✅ Bibliothèque exportée: ${filename}`);
-  }
-
-  /**
-   * Importe une bibliothèque depuis un fichier JSON
-   */
-  importLibraryFromFile(file: File): Promise<ExcalidrawLibrary> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        try {
-          const content = event.target?.result as string;
-          const library = JSON.parse(content) as ExcalidrawLibrary;
-
-          // Valider la structure
-          if (library.type !== 'excalidrawlib' || !Array.isArray(library.libraryItems)) {
-            throw new Error('Format de bibliothèque invalide');
-          }
-
-          this._currentLibrary.set(library);
-          console.log('✅ Bibliothèque importée avec succès');
-          resolve(library);
-        } catch (error) {
-          console.error("❌ Erreur lors de l'import:", error);
-          reject(error);
-        }
-      };
-
-      reader.onerror = (error) => {
-        reject(error);
-      };
-
-      reader.readAsText(file);
-    });
-  }
-
-  /**
-   * SECTION: Templates d'architecture
-   */
-
-  /**
-   * Génère un template d'architecture complète
-   */
-  generateArchitectureTemplate(templateName: string): ExcalidrawLibrary {
-    const templates: Record<string, () => ExcalidrawGroup[]> = {
-      ecommerce: () => this.generateEcommerceTemplate(),
-      dashboard: () => this.generateDashboardTemplate(),
-      'micro-frontend': () => this.generateMicroFrontendTemplate(),
-    };
-
-    const generateTemplate = templates[templateName];
-    if (!generateTemplate) {
-      throw new Error(`Template inconnu: ${templateName}`);
-    }
-
-    const groups = generateTemplate();
-    const libraryItems: LibraryItem[] = groups.map((group, index) => ({
-      id: `${templateName}-${index}-${group.name.toLowerCase().replace(/\s+/g, '-')}`,
-      status: 'published',
-      elements: group.elements,
-      created: Date.now(),
-    }));
-
-    const library: ExcalidrawLibrary = {
-      type: 'excalidrawlib',
-      version: 2,
-      source: 'https://github.com/votre-repo/angular-architecture-kit',
-      libraryItems,
-    };
-
-    this._currentLibrary.set(library);
-    return library;
-  }
-
-  /**
-   * Template E-commerce
-   */
-  private generateEcommerceTemplate(): ExcalidrawGroup[] {
-    return [
-      this.generateStandaloneComponent(),
-      this.generateSmartComponent(),
-      this.generateService(),
-      this.generateNgRxStore(),
-    ];
-  }
-
-  /**
-   * Template Dashboard
-   */
-  private generateDashboardTemplate(): ExcalidrawGroup[] {
-    return [
-      this.generateStandaloneComponent(),
-      this.generateSignalComponent(),
-      this.generateRoute(),
-      this.generateService(),
-    ];
-  }
-
-  /**
-   * Template Micro-Frontend
-   */
-  private generateMicroFrontendTemplate(): ExcalidrawGroup[] {
-    return [this.generateStandaloneComponent(), this.generateService(), this.generateRoute()];
   }
 }
