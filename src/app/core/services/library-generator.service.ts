@@ -547,6 +547,7 @@ export class LibraryGeneratorService {
    */
   generateComponentByType(type: ComponentType): ExcalidrawGroup {
     switch (type) {
+      // Components
       case ComponentType.STANDALONE_COMPONENT:
         return this.generateStandaloneComponent();
       case ComponentType.SMART_COMPONENT:
@@ -555,10 +556,115 @@ export class LibraryGeneratorService {
         return this.generatePresentationalComponent();
       case ComponentType.SIGNAL_COMPONENT:
         return this.generateSignalComponent();
+      case ComponentType.LAYOUT_COMPONENT:
+        return this.generateLayoutComponent();
+      case ComponentType.FEATURE_COMPONENT:
+        return this.generateFeatureComponent();
+
+      // Services
       case ComponentType.INJECTABLE_SERVICE:
         return this.generateService();
+      case ComponentType.HTTP_SERVICE:
+        return this.generateHttpService();
+      case ComponentType.FACADE_SERVICE:
+        return this.generateFacadeService();
+      case ComponentType.REPOSITORY_SERVICE:
+        return this.generateRepositoryService();
+      case ComponentType.UTILITY_SERVICE:
+        return this.generateService(); // Utiliser le service de base
+
+      // Routing
+      case ComponentType.ROUTE_NODE:
+        return this.generateRoute();
+      case ComponentType.CHILD_ROUTE:
+        return this.generateRoute();
+      case ComponentType.LAZY_LOADED_ROUTE:
+        return this.generateRoute();
+      case ComponentType.ROUTE_GUARD:
+        return this.generateRouteGuard();
+      case ComponentType.ROUTE_RESOLVER:
+        return this.generateRouteGuard();
+      case ComponentType.ROUTER_OUTLET:
+        return this.generateRoute();
+
+      // Signals
+      case ComponentType.SIGNAL:
+        return this.generateSignal();
+      case ComponentType.COMPUTED_SIGNAL:
+        return this.generateSignal();
+      case ComponentType.LINKED_SIGNAL:
+        return this.generateSignal();
+      case ComponentType.SIGNAL_EFFECT:
+        return this.generateSignal();
+      case ComponentType.SIGNAL_RESOURCE:
+        return this.generateSignal();
+
+      // RxJS
+      case ComponentType.OBSERVABLE:
+        return this.generateObservable();
+      case ComponentType.SUBJECT:
+        return this.generateSubject();
+      case ComponentType.BEHAVIOR_SUBJECT:
+        return this.generateBehaviorSubject();
+      case ComponentType.REPLAY_SUBJECT:
+        return this.generateBehaviorSubject();
+      case ComponentType.RXJS_OPERATOR:
+        return this.generateSubject();
+
+      // State Management
+      case ComponentType.NGRX_STORE:
+        return this.generateNgRxStore();
+      case ComponentType.NGRX_ACTION:
+        return this.generateNgRxStore();
+      case ComponentType.NGRX_REDUCER:
+        return this.generateNgRxStore();
+      case ComponentType.NGRX_EFFECT:
+        return this.generateNgRxStore();
+      case ComponentType.NGRX_SELECTOR:
+        return this.generateNgRxStore();
+      case ComponentType.SIGNAL_STORE:
+        return this.generateNgRxStore();
+
+      // UI Kit
+      case ComponentType.MATERIAL_TOOLBAR:
+        return this.generateMaterialToolbar();
+      case ComponentType.MATERIAL_SIDENAV:
+        return this.generateMaterialToolbar();
+      case ComponentType.MATERIAL_TABLE:
+        return this.generateMaterialCard();
+      case ComponentType.MATERIAL_DIALOG:
+        return this.generateMaterialCard();
+      case ComponentType.MATERIAL_CARD:
+        return this.generateMaterialCard();
+      case ComponentType.MATERIAL_FORM_FIELD:
+        return this.generateMaterialCard();
+
+      // Architecture
+      case ComponentType.MODULE:
+        return this.generateModule();
+      case ComponentType.MICRO_FRONTEND:
+        return this.generateMicroFrontend();
+      case ComponentType.CLEAN_ARCHITECTURE_LAYER:
+        return this.generateModule();
+      case ComponentType.HEXAGONAL_ARCHITECTURE:
+        return this.generateModule();
+
+      // Ecosystem
+      case ComponentType.REST_API:
+        return this.generateRestApi();
+      case ComponentType.GRAPHQL_API:
+        return this.generateRestApi();
+      case ComponentType.DATABASE:
+        return this.generateDatabase();
+      case ComponentType.DEVOPS_PIPELINE:
+        return this.generateDevOpsPipeline();
+
       default:
-        throw new Error(`Type de composant non supporté: ${type}`);
+        // Fallback pour les types non spécifiquement implémentés
+        console.warn(
+          `Type non spécifiquement implémenté, utilisation du générateur par défaut: ${type}`,
+        );
+        return this.generateStandaloneComponent();
     }
   }
 
@@ -629,5 +735,630 @@ export class LibraryGeneratorService {
     } catch (error) {
       console.error('❌ Erreur lors du téléchargement:', error);
     }
+  }
+  // Ajouter dans LibraryGeneratorService
+
+  /**
+   * Ajoute un composant à la bibliothèque actuelle
+   */
+  addComponentToLibrary(componentType: ComponentType): void {
+    const currentLibrary = this._currentLibrary();
+
+    try {
+      // Générer le groupe
+      const group = this.generateComponentByType(componentType);
+
+      // Créer le nouvel item
+      const newItem: LibraryItem = {
+        id: `${getComponentCategory(componentType).toLowerCase()}-${group.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
+        status: 'published',
+        elements: group.elements,
+        created: Date.now(),
+      };
+
+      if (currentLibrary) {
+        // Ajouter à la bibliothèque existante
+        const updatedLibrary: ExcalidrawLibrary = {
+          ...currentLibrary,
+          libraryItems: [...currentLibrary.libraryItems, newItem],
+        };
+        this._currentLibrary.set(updatedLibrary);
+        console.log(`✅ Composant ajouté à la bibliothèque: ${group.name}`);
+      } else {
+        // Créer une nouvelle bibliothèque avec ce composant
+        const newLibrary: ExcalidrawLibrary = {
+          type: 'excalidrawlib',
+          version: 2,
+          source: 'https://github.com/votre-repo/angular-architecture-kit',
+          libraryItems: [newItem],
+        };
+        this._currentLibrary.set(newLibrary);
+        console.log(`✅ Nouvelle bibliothèque créée avec: ${group.name}`);
+      }
+    } catch (error) {
+      console.error("❌ Erreur lors de l'ajout du composant:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Supprime un composant de la bibliothèque
+   */
+  removeComponentFromLibrary(itemId: string): void {
+    const currentLibrary = this._currentLibrary();
+    if (!currentLibrary) return;
+
+    const updatedItems = currentLibrary.libraryItems.filter((item) => item.id !== itemId);
+
+    const updatedLibrary: ExcalidrawLibrary = {
+      ...currentLibrary,
+      libraryItems: updatedItems,
+    };
+
+    this._currentLibrary.set(updatedLibrary);
+    console.log(`🗑️ Composant supprimé: ${itemId}`);
+  }
+  // Ajouter ces méthodes dans LibraryGeneratorService
+
+  /**
+   * Génère un composant Layout
+   */
+  generateLayoutComponent(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 250;
+    const height = 180;
+    const padding = 20;
+
+    elements.push(this.createRectangle(0, 0, width, height, 'components'));
+    elements.push(
+      this.createText(padding, 10, 'Layout Component', {
+        fontSize: 20,
+        strokeColor: ANGULAR_COLORS.components.dark,
+      }),
+    );
+    elements.push(this.createText(width - 50, 10, '📐', { fontSize: 24 }));
+
+    const sections = [
+      { label: 'Header', y: 50 },
+      { label: 'Sidebar', y: 75 },
+      { label: 'Content', y: 100 },
+      { label: 'Footer', y: 125 },
+    ];
+
+    sections.forEach((section) => {
+      elements.push(
+        this.createText(padding, section.y, section.label, {
+          fontSize: 14,
+          strokeColor: '#555555',
+        }),
+      );
+    });
+
+    return this.createGroup('Layout Component', elements);
+  }
+
+  /**
+   * Génère un composant Feature
+   */
+  generateFeatureComponent(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 250;
+    const height = 120;
+    const padding = 20;
+
+    elements.push(this.createRectangle(0, 0, width, height, 'components'));
+    elements.push(
+      this.createText(padding, 10, 'Feature Component', {
+        fontSize: 20,
+        strokeColor: ANGULAR_COLORS.components.dark,
+      }),
+    );
+    elements.push(this.createText(width - 50, 10, '📁', { fontSize: 24 }));
+
+    elements.push(
+      this.createText(padding, 50, 'Feature Module', {
+        fontSize: 14,
+        strokeColor: '#555555',
+      }),
+    );
+
+    return this.createGroup('Feature Component', elements);
+  }
+
+  /**
+   * Génère un service HTTP
+   */
+  generateHttpService(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 200;
+    const height = 100;
+    const padding = 20;
+
+    elements.push(this.createRectangle(0, 0, width, height, 'services'));
+    elements.push(
+      this.createText(padding, 10, 'HTTP Service', {
+        fontSize: 18,
+        strokeColor: ANGULAR_COLORS.services.dark,
+      }),
+    );
+    elements.push(this.createText(width - 45, 10, '🌐', { fontSize: 20 }));
+
+    elements.push(
+      this.createText(padding, 50, 'HttpClient', {
+        fontSize: 14,
+        strokeColor: '#1565C0',
+      }),
+    );
+
+    return this.createGroup('HTTP Service', elements);
+  }
+
+  /**
+   * Génère un service Facade
+   */
+  generateFacadeService(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 200;
+    const height = 100;
+    const padding = 20;
+
+    elements.push(this.createRectangle(0, 0, width, height, 'services'));
+    elements.push(
+      this.createText(padding, 10, 'Facade Service', {
+        fontSize: 18,
+        strokeColor: ANGULAR_COLORS.services.dark,
+      }),
+    );
+    elements.push(this.createText(width - 45, 10, '🏗️', { fontSize: 20 }));
+
+    elements.push(
+      this.createText(padding, 50, 'Facade Pattern', {
+        fontSize: 14,
+        strokeColor: '#555555',
+      }),
+    );
+
+    return this.createGroup('Facade Service', elements);
+  }
+
+  /**
+   * Génère un service Repository
+   */
+  generateRepositoryService(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 200;
+    const height = 100;
+    const padding = 20;
+
+    elements.push(this.createRectangle(0, 0, width, height, 'services'));
+    elements.push(
+      this.createText(padding, 10, 'Repository', {
+        fontSize: 18,
+        strokeColor: ANGULAR_COLORS.services.dark,
+      }),
+    );
+    elements.push(this.createText(width - 45, 10, '🗄️', { fontSize: 20 }));
+
+    elements.push(
+      this.createText(padding, 50, 'Data Access', {
+        fontSize: 14,
+        strokeColor: '#555555',
+      }),
+    );
+
+    return this.createGroup('Repository Service', elements);
+  }
+
+  /**
+   * Génère une route Angular
+   */
+  generateRoute(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 200;
+    const height = 80;
+    const padding = 20;
+
+    elements.push(this.createRectangle(0, 0, width, height, 'routing'));
+    elements.push(
+      this.createText(padding, 10, 'Route', {
+        fontSize: 18,
+        strokeColor: ANGULAR_COLORS.routing.dark,
+      }),
+    );
+    elements.push(this.createText(width - 45, 10, '🛣️', { fontSize: 20 }));
+
+    elements.push(
+      this.createText(padding, 45, '/dashboard', {
+        fontSize: 14,
+        strokeColor: '#1565C0',
+      }),
+    );
+
+    return this.createGroup('Route Angular', elements);
+  }
+
+  /**
+   * Génère un garde de route
+   */
+  generateRouteGuard(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 200;
+    const height = 80;
+    const padding = 20;
+
+    elements.push(this.createRectangle(0, 0, width, height, 'routing'));
+    elements.push(
+      this.createText(padding, 10, 'Route Guard', {
+        fontSize: 18,
+        strokeColor: ANGULAR_COLORS.routing.dark,
+      }),
+    );
+    elements.push(this.createText(width - 45, 10, '🛡️', { fontSize: 20 }));
+
+    elements.push(
+      this.createText(padding, 45, 'CanActivate', {
+        fontSize: 14,
+        strokeColor: '#E65100',
+      }),
+    );
+
+    return this.createGroup('Route Guard', elements);
+  }
+
+  /**
+   * Génère un Signal
+   */
+  generateSignal(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 150;
+    const height = 60;
+    const padding = 10;
+
+    elements.push(
+      this.createElement('ellipse', 0, 0, {
+        width,
+        height,
+        strokeColor: ANGULAR_COLORS.signals.primary,
+        backgroundColor: ANGULAR_COLORS.signals.light,
+        fillStyle: 'solid',
+        strokeWidth: 2,
+      }),
+    );
+
+    elements.push(
+      this.createText(width / 2 - 20, height / 2 - 15, '⚡', {
+        fontSize: 20,
+      }),
+    );
+
+    elements.push(
+      this.createText(width / 2 - 30, height / 2 + 5, 'signal()', {
+        fontSize: 12,
+        strokeColor: ANGULAR_COLORS.signals.dark,
+      }),
+    );
+
+    return this.createGroup('Signal', elements);
+  }
+
+  /**
+   * Génère un Subject RxJS
+   */
+  generateSubject(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 120;
+    const height = 40;
+    const padding = 10;
+
+    elements.push(
+      this.createRectangle(0, 0, width, height, 'rxjs', {
+        roundness: { type: 3, value: 12 },
+      }),
+    );
+
+    elements.push(
+      this.createText(padding, 10, 'Subject', {
+        fontSize: 14,
+        strokeColor: ANGULAR_COLORS.rxjs.dark,
+      }),
+    );
+
+    return this.createGroup('RxJS Subject', elements);
+  }
+
+  /**
+   * Génère un Observable RxJS
+   */
+  generateObservable(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 120;
+    const height = 40;
+    const padding = 10;
+
+    elements.push(
+      this.createRectangle(0, 0, width, height, 'rxjs', {
+        roundness: { type: 3, value: 12 },
+      }),
+    );
+
+    elements.push(
+      this.createText(padding, 10, 'Observable', {
+        fontSize: 14,
+        strokeColor: ANGULAR_COLORS.rxjs.dark,
+      }),
+    );
+
+    return this.createGroup('RxJS Observable', elements);
+  }
+
+  /**
+   * Génère un BehaviorSubject RxJS
+   */
+  generateBehaviorSubject(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 150;
+    const height = 40;
+    const padding = 10;
+
+    elements.push(
+      this.createRectangle(0, 0, width, height, 'rxjs', {
+        roundness: { type: 3, value: 12 },
+      }),
+    );
+
+    elements.push(
+      this.createText(padding, 10, 'BehaviorSubject', {
+        fontSize: 12,
+        strokeColor: ANGULAR_COLORS.rxjs.dark,
+      }),
+    );
+
+    return this.createGroup('BehaviorSubject', elements);
+  }
+
+  /**
+   * Génère un Store NgRx
+   */
+  generateNgRxStore(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 250;
+    const height = 150;
+    const padding = 20;
+
+    elements.push(
+      this.createRectangle(0, 0, width, height, 'architecture', {
+        backgroundColor: '#FFF3E0',
+      }),
+    );
+
+    elements.push(
+      this.createText(padding, 10, 'NgRx Store', {
+        fontSize: 20,
+        strokeColor: ANGULAR_COLORS.architecture.dark,
+      }),
+    );
+    elements.push(this.createText(width - 50, 10, '🏪', { fontSize: 24 }));
+
+    const sections = [
+      { label: 'Actions', y: 50 },
+      { label: 'Reducers', y: 75 },
+      { label: 'Effects', y: 100 },
+      { label: 'Selectors', y: 125 },
+    ];
+
+    sections.forEach((section) => {
+      elements.push(
+        this.createText(padding, section.y, section.label, {
+          fontSize: 14,
+          strokeColor: '#E65100',
+        }),
+      );
+    });
+
+    return this.createGroup('NgRx Store', elements);
+  }
+
+  /**
+   * Génère un module Angular
+   */
+  generateModule(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 200;
+    const height = 100;
+    const padding = 20;
+
+    elements.push(this.createRectangle(0, 0, width, height, 'architecture'));
+    elements.push(
+      this.createText(padding, 10, 'Angular Module', {
+        fontSize: 18,
+        strokeColor: ANGULAR_COLORS.architecture.dark,
+      }),
+    );
+    elements.push(this.createText(width - 45, 10, '📦', { fontSize: 20 }));
+
+    elements.push(
+      this.createText(padding, 50, '@NgModule()', {
+        fontSize: 14,
+        strokeColor: '#E65100',
+      }),
+    );
+
+    return this.createGroup('Angular Module', elements);
+  }
+
+  /**
+   * Génère un Micro Frontend
+   */
+  generateMicroFrontend(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 200;
+    const height = 100;
+    const padding = 20;
+
+    elements.push(
+      this.createRectangle(0, 0, width, height, 'architecture', {
+        strokeStyle: 'dashed',
+      }),
+    );
+    elements.push(
+      this.createText(padding, 10, 'Micro Frontend', {
+        fontSize: 18,
+        strokeColor: ANGULAR_COLORS.architecture.dark,
+      }),
+    );
+    elements.push(this.createText(width - 45, 10, '🧩', { fontSize: 20 }));
+
+    elements.push(
+      this.createText(padding, 50, 'Module Federation', {
+        fontSize: 14,
+        strokeColor: '#E65100',
+      }),
+    );
+
+    return this.createGroup('Micro Frontend', elements);
+  }
+
+  /**
+   * Génère une API REST
+   */
+  generateRestApi(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 150;
+    const height = 60;
+    const padding = 10;
+
+    elements.push(this.createRectangle(0, 0, width, height, 'architecture'));
+    elements.push(
+      this.createText(padding, 10, 'REST API', {
+        fontSize: 14,
+        strokeColor: '#E65100',
+      }),
+    );
+    elements.push(this.createText(width - 40, 10, '🔌', { fontSize: 16 }));
+
+    return this.createGroup('REST API', elements);
+  }
+
+  /**
+   * Génère une base de données
+   */
+  generateDatabase(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 150;
+    const height = 60;
+    const padding = 10;
+
+    elements.push(this.createRectangle(0, 0, width, height, 'architecture'));
+    elements.push(
+      this.createText(padding, 10, 'Database', {
+        fontSize: 14,
+        strokeColor: '#E65100',
+      }),
+    );
+    elements.push(this.createText(width - 40, 10, '🗃️', { fontSize: 16 }));
+
+    return this.createGroup('Database', elements);
+  }
+
+  /**
+   * Génère un pipeline DevOps
+   */
+  generateDevOpsPipeline(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 250;
+    const height = 100;
+    const padding = 20;
+
+    elements.push(
+      this.createRectangle(0, 0, width, height, 'architecture', {
+        backgroundColor: '#E3F2FD',
+      }),
+    );
+    elements.push(
+      this.createText(padding, 10, 'DevOps Pipeline', {
+        fontSize: 18,
+        strokeColor: '#1565C0',
+      }),
+    );
+    elements.push(this.createText(width - 50, 10, '🚀', { fontSize: 24 }));
+
+    const stages = [
+      { label: 'Build → Test → Deploy', y: 50 },
+      { label: 'CI/CD', y: 75 },
+    ];
+
+    stages.forEach((stage) => {
+      elements.push(
+        this.createText(padding, stage.y, stage.label, {
+          fontSize: 14,
+          strokeColor: '#1565C0',
+        }),
+      );
+    });
+
+    return this.createGroup('DevOps Pipeline', elements);
+  }
+
+  /**
+   * Génère un composant Material Toolbar
+   */
+  generateMaterialToolbar(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 250;
+    const height = 60;
+    const padding = 20;
+
+    elements.push(
+      this.createRectangle(0, 0, width, height, 'architecture', {
+        backgroundColor: '#F5F5F5',
+      }),
+    );
+    elements.push(
+      this.createText(padding, 15, 'Toolbar', {
+        fontSize: 18,
+        strokeColor: '#424242',
+      }),
+    );
+    elements.push(this.createText(width - 50, 15, '📊', { fontSize: 20 }));
+
+    return this.createGroup('Material Toolbar', elements);
+  }
+
+  /**
+   * Génère un composant Material Card
+   */
+  generateMaterialCard(): ExcalidrawGroup {
+    const elements: ExcalidrawElement[] = [];
+    const width = 200;
+    const height = 120;
+    const padding = 20;
+
+    elements.push(
+      this.createRectangle(0, 0, width, height, 'architecture', {
+        backgroundColor: '#FAFAFA',
+      }),
+    );
+    elements.push(
+      this.createText(padding, 10, 'Card', {
+        fontSize: 18,
+        strokeColor: '#424242',
+      }),
+    );
+    elements.push(this.createText(width - 45, 10, '🃏', { fontSize: 20 }));
+
+    elements.push(
+      this.createText(padding, 50, 'Title', {
+        fontSize: 14,
+        strokeColor: '#424242',
+      }),
+    );
+    elements.push(
+      this.createText(padding, 75, 'Content', {
+        fontSize: 12,
+        strokeColor: '#757575',
+      }),
+    );
+
+    return this.createGroup('Material Card', elements);
   }
 }

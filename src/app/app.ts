@@ -850,18 +850,41 @@ export class AppComponent {
   }
 
   addComponent(component: any) {
-    console.log('Ajout du composant:', component);
-    try {
+    console.log('=== Ajout du composant ===');
+    console.log('Composant:', component);
+
+    /*try {
       const group = this.generatorService.generateComponentByType(component.type);
       console.log('Composant généré:', group);
       this.showSnackBar(`Composant ajouté: ${component.defaultName}`);
     } catch (error) {
       console.error("Erreur lors de l'ajout:", error);
       this.showSnackBar("Erreur lors de l'ajout du composant", 'error');
+    }*/
+    try {
+      // Utiliser la nouvelle méthode pour ajouter à la bibliothèque
+      this.generatorService.addComponentToLibrary(component.type);
+
+      // Mettre à jour la prévisualisation
+      this.previewLibrary = this.generatorService.currentLibrary();
+
+      // Afficher une notification
+      this.showSnackBar(`✅ ${component.defaultName} ajouté à la bibliothèque`);
+
+      // Log pour vérifier
+      const library = this.generatorService.currentLibrary();
+      console.log(
+        'Bibliothèque après ajout:',
+        library ? library.libraryItems.length : 0,
+        'éléments',
+      );
+    } catch (error) {
+      console.error("❌ Erreur lors de l'ajout:", error);
+      this.showSnackBar("❌ Erreur lors de l'ajout du composant", 'error');
     }
   }
 
-  previewComponent(component: any) {
+  /*previewComponent(component: any) {
     console.log('Prévisualisation:', component);
     try {
       const group = this.generatorService.generateComponentByType(component.type);
@@ -873,6 +896,85 @@ export class AppComponent {
     } catch (error) {
       console.error('Erreur de prévisualisation:', error);
       this.showSnackBar('Erreur lors de la prévisualisation', 'error');
+    }
+  }*/
+
+  // Dans AppComponent, remplacer la méthode previewComponent
+
+  previewComponent(component: any) {
+    console.log('=== Prévisualisation du composant ===');
+    console.log('Composant:', component);
+
+    try {
+      // Générer le groupe
+      const group = this.generatorService.generateComponentByType(component.type);
+      console.log('Groupe généré:', group.name, 'avec', group.elements.length, 'éléments');
+
+      // Mettre à jour l'état de prévisualisation
+      this.previewGroup = group;
+      this.previewMode = 'single';
+      this.selectedPreviewComponent = component.type;
+
+      // Forcer la mise à jour
+      this.updatePreview();
+
+      // Afficher une notification
+      this.showSnackBar(`👁️ Aperçu: ${component.defaultName}`);
+    } catch (error) {
+      console.error('❌ Erreur de prévisualisation:', error);
+      this.showSnackBar('❌ Impossible de prévisualiser ce composant', 'error');
+    }
+  }
+
+  // Améliorer la méthode updatePreview
+  updatePreview(): void {
+    console.log('=== Mise à jour de la prévisualisation ===');
+    console.log('Mode:', this.previewMode);
+
+    if (!this.generatorService.currentLibrary() && this.previewMode === 'library') {
+      console.warn('Pas de bibliothèque générée pour le mode library');
+    }
+
+    switch (this.previewMode) {
+      case 'single':
+        try {
+          const group = this.generatorService.generateComponentByType(
+            this.selectedPreviewComponent,
+          );
+          this.previewGroup = group;
+          this.previewGroups = [];
+          console.log('✅ PreviewGroup mis à jour:', group.name);
+        } catch (error) {
+          console.warn('⚠️ Impossible de générer la prévisualisation:', error);
+          this.previewGroup = null;
+        }
+        break;
+
+      case 'multiple':
+        try {
+          const groups = this.generatorService
+            .generateByCategory(ComponentCategory.COMPONENTS)
+            .slice(0, 3);
+          this.previewGroups = groups;
+          this.previewGroup = null;
+          console.log('✅ PreviewGroups mis à jour:', groups.length, 'groupes');
+        } catch (error) {
+          console.warn('⚠️ Impossible de générer les groupes:', error);
+          this.previewGroups = [];
+        }
+        break;
+
+      case 'library':
+        const library = this.generatorService.currentLibrary();
+        this.previewLibrary = library;
+        this.previewGroup = null;
+        this.previewGroups = [];
+        console.log(
+          '✅ PreviewLibrary mise à jour:',
+          library ? library.libraryItems.length : 0,
+          'items',
+        );
+        break;
     }
   }
 
@@ -901,7 +1003,7 @@ export class AppComponent {
       this.showSnackBar('Copié dans le presse-papier');
     });
   }
-
+  /*
   updatePreview(): void {
     if (!this.generatorService.currentLibrary()) return;
 
@@ -931,7 +1033,7 @@ export class AppComponent {
         this.previewGroups = [];
         break;
     }
-  }
+  }*/
 
   onPreviewModeChange(event: any): void {
     this.previewMode = event.value || event;
