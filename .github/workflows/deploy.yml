@@ -16,7 +16,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
+        node-version: '22'
         cache: 'npm'
     
     - name: Install dependencies
@@ -28,7 +28,7 @@ jobs:
           --base-href "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/"
     
     - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+      uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./dist/angular-architecture-kit/browser
