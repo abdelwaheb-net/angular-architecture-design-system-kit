@@ -97,11 +97,27 @@ import { MatIconModule } from '@angular/material/icon';
               </tr>
               <tr>
                 <td><kbd>Ctrl</kbd> + <kbd>E</kbd></td>
-                <td>Ouvrir le dialog d'export</td>
+                <td>Ouvrir le dialogue d'export</td>
               </tr>
               <tr>
                 <td><kbd>Ctrl</kbd> + <kbd>S</kbd></td>
                 <td>Sauvegarder la bibliothèque</td>
+              </tr>
+              <tr>
+                <td><kbd>Ctrl</kbd> + <kbd>P</kbd></td>
+                <td>Exporter en PDF</td>
+              </tr>
+              <tr>
+                <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></td>
+                <td>Exporter en SVG</td>
+              </tr>
+              <tr>
+                <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd></td>
+                <td>Copier le lien de partage</td>
+              </tr>
+              <tr>
+                <td><kbd>F1</kbd></td>
+                <td>Ouvrir la documentation</td>
               </tr>
             </table>
           </div>

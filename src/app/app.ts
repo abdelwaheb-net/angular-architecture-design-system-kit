@@ -115,6 +115,7 @@ import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-previ
         <button
           mat-raised-button
           (click)="generateLibrary()"
+          matTooltip="Générer (Ctrl+G)"
           [disabled]="generatorService.isGenerating()"
         >
           <mat-icon>refresh</mat-icon>
@@ -128,6 +129,7 @@ import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-previ
         <button
           mat-raised-button
           (click)="exportLibrary()"
+          matTooltip="Exporter (Ctrl+E)"
           [disabled]="!generatorService.currentLibrary()"
         >
           <mat-icon>download</mat-icon> Exporter
@@ -976,49 +978,64 @@ export class AppComponent implements OnInit {
   private setupKeyboardShortcuts(): void {
     console.log('=== Configuration des raccourcis clavier ===');
 
-    this.keyboardShortcuts.shortcuts$.subscribe((action) => {
-      console.log('Raccourci clavier déclenché:', action);
+    // Vérifier que le service est disponible
+    if (!this.keyboardShortcuts) {
+      console.error('❌ KeyboardShortcutsService non disponible');
+      return;
+    }
 
-      switch (action) {
-        case 'generate':
-          console.log('→ Générer la bibliothèque');
-          this.generateLibrary();
-          break;
-
-        case 'export':
-          console.log("→ Ouvrir le dialogue d'export");
-          this.openExportDialog();
-          break;
-
-        case 'save':
-          console.log('→ Sauvegarder la bibliothèque');
-          this.saveLibrary();
-          break;
-
-        case 'export-svg':
-          console.log('→ Exporter en SVG');
-          this.exportToSVG();
-          break;
-
-        case 'export-pdf':
-          console.log('→ Exporter en PDF');
-          this.exportLibraryToPDF();
-          break;
-
-        case 'share-link':
-          console.log('→ Copier le lien de partage');
-          this.copyShareLink();
-          break;
-
-        case 'docs':
-          console.log('→ Ouvrir la documentation');
-          this.openDocs();
-          break;
-
-        default:
-          console.log('→ Action inconnue:', action);
-      }
+    // S'abonner aux raccourcis
+    this.keyboardShortcuts.shortcuts$.subscribe({
+      next: (action) => {
+        console.log('🎯 Raccourci reçu:', action);
+        this.handleShortcut(action);
+      },
+      error: (error) => {
+        console.error('❌ Erreur dans les raccourcis:', error);
+      },
     });
+
+    console.log('✅ Abonnement aux raccourcis configuré');
+  }
+
+  /**
+   * Gère les actions des raccourcis
+   */
+  private handleShortcut(action: string): void {
+    console.log('=== Exécution du raccourci:', action, '===');
+
+    switch (action) {
+      case 'generate':
+        this.generateLibrary();
+        break;
+
+      case 'export':
+        this.openExportDialog();
+        break;
+
+      case 'save':
+        this.saveLibrary();
+        break;
+
+      case 'export-pdf':
+        this.exportLibraryToPDF();
+        break;
+
+      case 'export-svg':
+        this.exportToSVG();
+        break;
+
+      case 'share-link':
+        this.copyShareLink();
+        break;
+
+      case 'docs':
+        this.openDocs();
+        break;
+
+      default:
+        console.warn('⚠️ Action inconnue:', action);
+    }
   }
 
   /**
@@ -1068,8 +1085,6 @@ export class AppComponent implements OnInit {
         this.showSnackBar("❌ Erreur lors de l'ouverture du dialogue", 'error');
       });
   }
-
-
 }
 export { AppComponent as App };
 

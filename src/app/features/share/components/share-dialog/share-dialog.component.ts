@@ -1,10 +1,11 @@
-// share-dialog.component.ts
+// share-dialog.component.ts - Version corrigée
 import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ExcalidrawLibrary } from '../../../../core/models/excalidraw-element.model';
@@ -21,6 +22,7 @@ import { ShareService } from '../../../../core/services/share.service';
     MatInputModule,
     MatTooltipModule,
     MatSnackBarModule,
+    MatProgressSpinnerModule,
   ],
   template: `
     <h2 mat-dialog-title>🔗 Partager la bibliothèque</h2>
@@ -77,15 +79,23 @@ import { ShareService } from '../../../../core/services/share.service';
         <!-- Sauvegarde cloud -->
         <div class="cloud-save">
           <h3>Sauvegarde cloud</h3>
-          <button mat-raised-button color="primary" (click)="saveToCloud()" [disabled]="isSaving">
-            @if (isSaving) {
-              <mat-icon>hourglass_empty</mat-icon>
-              Sauvegarde...
-            } @else {
-              <mat-icon>cloud_upload</mat-icon>
-              Sauvegarder dans le cloud
-            }
-          </button>
+
+          <!-- Utiliser ng-container pour éviter l'avertissement -->
+          @if (isSaving) {
+            <ng-container>
+              <button mat-raised-button color="primary" disabled>
+                <mat-icon>hourglass_empty</mat-icon>
+                Sauvegarde...
+              </button>
+            </ng-container>
+          } @else {
+            <ng-container>
+              <button mat-raised-button color="primary" (click)="saveToCloud()">
+                <mat-icon>cloud_upload</mat-icon>
+                Sauvegarder dans le cloud
+              </button>
+            </ng-container>
+          }
 
           @if (cloudUrl) {
             <p class="cloud-url">
