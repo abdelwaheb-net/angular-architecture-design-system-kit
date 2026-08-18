@@ -1,0 +1,36 @@
+# Créer le fichier
+echo 'name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+        cache: "npm"
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build
+      run: |
+        npx ng build --configuration production \
+          --base-href "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/"
+    
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist/angular-architecture-kit/browser
+        publish_branch: gh-pages' > .github/workflows/deploy.yml

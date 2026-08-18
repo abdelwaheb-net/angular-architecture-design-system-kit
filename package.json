@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:angular-architecture-kit": "node dist/angular-architecture-kit/server/server.mjs",
-    "deploy:github": "ng build --configuration production --base-href \"https://abdelwaheb-net.github.io/angular-architecture-kit/\" && ngh --dir=dist/angular-architecture-kit/browser"
+    "deploy": "ng build --configuration production --base-href \"/angular-architecture-design-system-kit/\" && ngh --dir=dist/angular-architecture-kit/browser"
   },
   "prettier": {
     "printWidth": 100,
@@ -54,6 +54,7 @@
     "@angular/compiler-cli": "^21.1.0",
     "@types/express": "^5.0.1",
     "@types/node": "^20.17.19",
+    "angular-cli-ghpages": "^3.1.0",
     "typescript": "~5.9.2"
   }
 }
