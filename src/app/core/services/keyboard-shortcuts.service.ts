@@ -32,6 +32,23 @@ export class KeyboardShortcutsService {
         event.preventDefault();
         this.shortcuts.next('save');
       }
+      // Ctrl + P : Exporter en PDF
+      if ((event.ctrlKey || event.metaKey) && event.key === 'p') {
+        event.preventDefault();
+        this.shortcuts.next('export-pdf');
+      }
+      // Ctrl + P : Exporter en PDF
+      if ((event.ctrlKey || event.metaKey) && event.key === 'p') {
+        event.preventDefault();
+        this.shortcuts.next('export-pdf');
+      }
+
+      // Ajouter dans setupListener()
+      // Ctrl + Shift + C : Copier le lien de partage
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'c') {
+        event.preventDefault();
+        this.shortcuts.next('share-link');
+      }
     });
   }
 }

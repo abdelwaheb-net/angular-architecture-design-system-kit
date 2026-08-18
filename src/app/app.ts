@@ -31,9 +31,13 @@ import { ExcalidrawGroup, ExcalidrawLibrary } from './core/models/excalidraw-ele
 import { FileExportService } from './core/services/file-export.service';
 import { KeyboardShortcutsService } from './core/services/keyboard-shortcuts.service';
 import { LibraryGeneratorService } from './core/services/library-generator.service';
+import { PdfExportService } from './core/services/pdf-export.service';
+import { ShareService } from './core/services/share.service';
 import { StorageService } from './core/services/storage.service';
+import { SvgExportService } from './core/services/svg-export.service';
 import { ThemeService } from './core/services/theme.service';
 import { DocsComponent } from './features/docs/docs.component';
+import { StatisticsComponent } from "./features/statistics/statistics.component";
 import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-preview/excalidraw-preview.component';
 
 @Component({
@@ -62,6 +66,7 @@ import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-previ
     MatExpansionModule,
     ExcalidrawPreviewComponent,
     DocsComponent,
+    StatisticsComponent,
   ],
   template: `
     <div class="app-container">
@@ -69,6 +74,31 @@ import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-previ
       <mat-toolbar color="primary">
         <span class="logo">🚀 Angular Architecture Kit</span>
         <span class="spacer"></span>
+
+        <!-- Bouton Partager -->
+        <button
+          mat-icon-button
+          matTooltip="Partager"
+          (click)="openShareDialog()"
+          [disabled]="!generatorService.currentLibrary()"
+        >
+          <mat-icon>share</mat-icon>
+        </button>
+
+        <!-- Bouton Copier le lien -->
+        <button
+          mat-icon-button
+          matTooltip="Copier le lien"
+          (click)="copyShareLink()"
+          [disabled]="!generatorService.currentLibrary()"
+        >
+          <mat-icon>link</mat-icon>
+        </button>
+
+        <!-- Bouton Documentation -->
+        <button mat-icon-button matTooltip="Documentation" (click)="openDocs()">
+          <mat-icon>help</mat-icon>
+        </button>
 
         <button mat-icon-button matTooltip="Documentation" (click)="openDocs()">
           <mat-icon>help</mat-icon>
@@ -295,21 +325,57 @@ import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-previ
           <!-- Onglet Export -->
           <mat-tab label="Export">
             <div class="tab-content">
-              <h2>💾 Export</h2>
+              <h2>💾 Export de la bibliothèque</h2>
 
-              <mat-form-field appearance="fill" class="full-width">
-                <mat-label>Nom du fichier</mat-label>
-                <input matInput [(ngModel)]="exportFilename" />
-              </mat-form-field>
+              <div class="export-options">
+                <mat-form-field appearance="fill" class="full-width">
+                  <mat-label>Nom du fichier</mat-label>
+                  <input matInput [(ngModel)]="exportFilename" />
+                </mat-form-field>
 
-              <div class="export-actions">
-                <button mat-raised-button color="primary" (click)="exportLibrary()">
-                  <mat-icon>download</mat-icon> Télécharger .excalidrawlib
-                </button>
+                <h3>Formats disponibles :</h3>
 
-                <button mat-raised-button (click)="copyToClipboard()">
-                  <mat-icon>content_copy</mat-icon> Copier JSON
-                </button>
+                <div class="export-actions">
+                  <!-- Export Excalidraw -->
+                  <button mat-raised-button color="primary" (click)="exportLibrary()">
+                    <mat-icon>download</mat-icon>
+                    Télécharger .excalidrawlib
+                  </button>
+
+                  <!-- Export SVG -->
+                  <button mat-raised-button color="accent" (click)="exportToSVG()">
+                    <mat-icon>brush</mat-icon>
+                    Exporter en SVG
+                  </button>
+
+                  <!-- Export PDF -->
+                  <button mat-raised-button color="warn" (click)="exportLibraryToPDF()">
+                    <mat-icon>picture_as_pdf</mat-icon>
+                    Exporter en PDF
+                  </button>
+
+                  <!-- Export PDF de la prévisualisation -->
+                  @if (previewGroup) {
+                    <button mat-raised-button (click)="exportPreviewToPDF()">
+                      <mat-icon>picture_as_pdf</mat-icon>
+                      Exporter l'aperçu en PDF
+                    </button>
+                  }
+
+                  <!-- Export SVG du groupe prévisualisé -->
+                  @if (previewGroup) {
+                    <button mat-raised-button (click)="exportGroupToSVG()">
+                      <mat-icon>image</mat-icon>
+                      Exporter le groupe en SVG
+                    </button>
+                  }
+
+                  <!-- Copier JSON -->
+                  <button mat-raised-button (click)="copyToClipboard()">
+                    <mat-icon>content_copy</mat-icon>
+                    Copier JSON
+                  </button>
+                </div>
               </div>
             </div>
           </mat-tab>
@@ -317,6 +383,9 @@ import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-previ
           <!-- Onglet Documentation -->
           <mat-tab label="Documentation">
             <app-docs></app-docs>
+          </mat-tab>
+          <mat-tab label="Statistiques">
+            <app-statistics></app-statistics>
           </mat-tab>
         </mat-tab-group>
       </main>
@@ -476,18 +545,23 @@ export class AppComponent implements OnInit {
     private snackBar: MatSnackBar,
     public themeService: ThemeService,
     private keyboardShortcuts: KeyboardShortcutsService,
+    private svgExportService: SvgExportService,
+    private pdfExportService: PdfExportService,
+    private shareService: ShareService,
   ) {
     console.log('=== AppComponent initialisé ===');
     console.log('Composants:', this.availableComponents.length);
     console.log('Templates:', this.architectureTemplates.length);
 
-   effect(() => {
-     const library = this.generatorService.currentLibrary();
-     if (library) {
-       console.log('📚 Bibliothèque mise à jour:', library.libraryItems.length, 'items');
-       this.previewLibrary = library;
-     }
-   });
+    effect(() => {
+      const library = this.generatorService.currentLibrary();
+      if (library) {
+        console.log('📚 Bibliothèque mise à jour:', library.libraryItems.length, 'items');
+        this.previewLibrary = library;
+      }
+    });
+    this.setupKeyboardShortcuts();
+    this.loadLibraryFromUrl();
   }
 
   ngOnInit(): void {
@@ -739,6 +813,263 @@ export class AppComponent implements OnInit {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   }
+  exportToSVG(): void {
+    console.log('=== Export SVG ===');
+
+    const library = this.generatorService.currentLibrary();
+    if (!library) {
+      this.showSnackBar('❌ Aucune bibliothèque à exporter', 'error');
+      return;
+    }
+
+    try {
+      const svgContent = this.svgExportService.exportLibraryToSVG(library);
+      this.svgExportService.downloadSVG(svgContent, 'angular-architecture.svg');
+      this.showSnackBar('✅ Export SVG réussi');
+    } catch (error) {
+      console.error('Erreur export SVG:', error);
+      this.showSnackBar("❌ Erreur lors de l'export SVG", 'error');
+    }
+  }
+
+  // Ajouter la méthode d'export SVG pour un groupe
+  exportGroupToSVG(): void {
+    console.log('=== Export SVG du groupe ===');
+
+    if (!this.previewGroup) {
+      this.showSnackBar('❌ Aucun groupe à exporter', 'error');
+      return;
+    }
+
+    try {
+      const svgContent = this.svgExportService.exportGroupToSVG(this.previewGroup);
+      this.svgExportService.downloadSVG(svgContent, `${this.previewGroup.name}.svg`);
+      this.showSnackBar('✅ Export SVG du groupe réussi');
+    } catch (error) {
+      console.error('Erreur export SVG:', error);
+      this.showSnackBar("❌ Erreur lors de l'export SVG", 'error');
+    }
+  }
+  // Ajouter les méthodes d'export PDF
+
+  /**
+   * Exporte la prévisualisation en PDF
+   */
+  async exportPreviewToPDF(): Promise<void> {
+    console.log('=== Export Prévisualisation PDF ===');
+
+    if (!this.previewGroup && !this.generatorService.currentLibrary()) {
+      this.showSnackBar('❌ Aucun contenu à exporter', 'error');
+      return;
+    }
+
+    try {
+      // Chercher le canvas de prévisualisation
+      const canvas = document.querySelector('app-excalidraw-preview canvas');
+
+      if (canvas) {
+        const imgData = (canvas as HTMLCanvasElement).toDataURL('image/png');
+
+        const { jsPDF } = await import('jspdf');
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'px',
+          format: [canvas.clientWidth, canvas.clientHeight],
+        });
+
+        pdf.addImage(imgData, 'PNG', 0, 0, canvas.clientWidth, canvas.clientHeight);
+        pdf.save('preview.pdf');
+
+        this.showSnackBar('✅ Export PDF réussi');
+      } else {
+        throw new Error('Canvas non trouvé');
+      }
+    } catch (error) {
+      console.error('❌ Erreur export PDF:', error);
+      this.showSnackBar("❌ Erreur lors de l'export PDF", 'error');
+    }
+  }
+
+  /**
+   * Exporte la bibliothèque complète en PDF
+   */
+  async exportLibraryToPDF(): Promise<void> {
+    console.log('=== Export Bibliothèque PDF ===');
+
+    const library = this.generatorService.currentLibrary();
+    if (!library) {
+      this.showSnackBar('❌ Aucune bibliothèque à exporter', 'error');
+      return;
+    }
+
+    try {
+      await this.pdfExportService.exportLibraryToPDF(library, 'angular-architecture.pdf');
+      this.showSnackBar('✅ Export PDF réussi');
+    } catch (error) {
+      console.error('❌ Erreur export PDF:', error);
+      this.showSnackBar("❌ Erreur lors de l'export PDF", 'error');
+    }
+  }
+  // Ajouter les méthodes de partage
+
+  /**
+   * Ouvre le dialogue de partage
+   */
+  openShareDialog(): void {
+    console.log('=== Ouverture du dialogue de partage ===');
+
+    const library = this.generatorService.currentLibrary();
+    if (!library) {
+      this.showSnackBar('❌ Aucune bibliothèque à partager', 'error');
+      return;
+    }
+
+    import('./features/share/components/share-dialog/share-dialog.component')
+      .then((module) => {
+        const dialogRef = this.dialog.open(module.ShareDialogComponent, {
+          width: '500px',
+          data: library,
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+          console.log('Dialogue de partage fermé:', result);
+        });
+      })
+      .catch((error) => {
+        console.error("❌ Erreur lors de l'ouverture du dialogue:", error);
+        this.showSnackBar("❌ Erreur lors de l'ouverture du dialogue", 'error');
+      });
+  }
+
+  /**
+   * Copie le lien de partage directement
+   */
+  copyShareLink(): void {
+    console.log('=== Copie du lien de partage ===');
+
+    const library = this.generatorService.currentLibrary();
+    if (!library) {
+      this.showSnackBar('❌ Aucune bibliothèque à partager', 'error');
+      return;
+    }
+
+    this.shareService.copyShareLink(library).then(() => {
+      this.showSnackBar('✅ Lien copié dans le presse-papier');
+    });
+  }
+
+  /**
+   * Charge la bibliothèque depuis l'URL
+   */
+  private loadLibraryFromUrl(): void {
+    const library = this.shareService.loadFromUrl();
+
+    if (library) {
+      console.log("📚 Bibliothèque chargée depuis l'URL");
+      this.generatorService['_currentLibrary'].set(library);
+      this.showSnackBar('📚 Bibliothèque chargée depuis le lien');
+    }
+  }
+  /**
+   * Configure les raccourcis clavier
+   */
+  private setupKeyboardShortcuts(): void {
+    console.log('=== Configuration des raccourcis clavier ===');
+
+    this.keyboardShortcuts.shortcuts$.subscribe((action) => {
+      console.log('Raccourci clavier déclenché:', action);
+
+      switch (action) {
+        case 'generate':
+          console.log('→ Générer la bibliothèque');
+          this.generateLibrary();
+          break;
+
+        case 'export':
+          console.log("→ Ouvrir le dialogue d'export");
+          this.openExportDialog();
+          break;
+
+        case 'save':
+          console.log('→ Sauvegarder la bibliothèque');
+          this.saveLibrary();
+          break;
+
+        case 'export-svg':
+          console.log('→ Exporter en SVG');
+          this.exportToSVG();
+          break;
+
+        case 'export-pdf':
+          console.log('→ Exporter en PDF');
+          this.exportLibraryToPDF();
+          break;
+
+        case 'share-link':
+          console.log('→ Copier le lien de partage');
+          this.copyShareLink();
+          break;
+
+        case 'docs':
+          console.log('→ Ouvrir la documentation');
+          this.openDocs();
+          break;
+
+        default:
+          console.log('→ Action inconnue:', action);
+      }
+    });
+  }
+
+  /**
+   * Sauvegarde la bibliothèque
+   */
+  private saveLibrary(): void {
+    const library = this.generatorService.currentLibrary();
+    if (library) {
+      this.storageService.saveLibrary(library);
+      this.showSnackBar('💾 Bibliothèque sauvegardée');
+    } else {
+      this.showSnackBar('❌ Aucune bibliothèque à sauvegarder', 'error');
+    }
+  }
+
+  // Dans la classe AppComponent, ajouter ces méthodes
+
+  /**
+   * Ouvre le dialogue d'export
+   */
+  openExportDialog(): void {
+    console.log("=== Ouverture du dialogue d'export ===");
+
+    const library = this.generatorService.currentLibrary();
+    if (!library) {
+      this.showSnackBar('❌ Aucune bibliothèque à exporter', 'error');
+      return;
+    }
+
+    // Import dynamique pour éviter les problèmes de compilation
+    import('./features/export/components/export-dialog/export-dialog.component')
+      .then((module) => {
+        const dialogRef = this.dialog.open(module.ExportDialogComponent, {
+          width: '500px',
+          data: library,
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+          if (result) {
+            console.log('Export effectué:', result);
+            this.showSnackBar(`✅ Exporté en ${result.format.toUpperCase()}`);
+          }
+        });
+      })
+      .catch((error) => {
+        console.error("❌ Erreur lors de l'ouverture du dialogue:", error);
+        this.showSnackBar("❌ Erreur lors de l'ouverture du dialogue", 'error');
+      });
+  }
+
+
 }
 export { AppComponent as App };
 
