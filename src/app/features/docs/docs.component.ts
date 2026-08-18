@@ -1,6 +1,6 @@
 // docs.component.ts - Version complète
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-docs',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, MatCardModule, MatExpansionModule, MatIconModule, MatButtonModule],
   template: `
     <div class="docs-container">

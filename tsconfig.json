@@ -22,7 +22,8 @@
     "strictTemplates": true,
     "extendedDiagnostics": {
       "checks": {
-        "controlFlowPreventingContentProjection": "suppress"
+        "controlFlowPreventingContentProjection": "suppress",
+        "optionalChainNotNullable": "warning"
       },
   },
   "files": [],

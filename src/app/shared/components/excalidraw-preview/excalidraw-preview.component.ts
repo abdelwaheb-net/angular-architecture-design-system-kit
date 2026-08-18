@@ -2,6 +2,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ElementRef,
@@ -25,6 +26,7 @@ import { CanvasRendererService } from '../../../core/services/canvas-renderer.se
 @Component({
   selector: 'app-excalidraw-preview',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, MatButtonModule, MatIconModule, MatTooltipModule],
   template: `
     <div class="preview-container">
@@ -261,6 +263,7 @@ export class ExcalidrawPreviewComponent implements AfterViewInit, OnChanges {
           this.canvasRenderer.initializeCanvas(this.canvasRef);
           this.renderContent();
           this.cdr.detectChanges();
+          this.cdr.markForCheck();
         }, 200);
       }
     }
@@ -347,7 +350,7 @@ export class ExcalidrawPreviewComponent implements AfterViewInit, OnChanges {
   /**
    * Gestionnaire de mouse move pour le drag
    */
-  onMouseMove(event: MouseEvent): void {
+  /*onMouseMove(event: MouseEvent): void {
     if (!this.isDragging || !this.selectedElement) return;
 
     const canvas = this.canvasRef.nativeElement;
@@ -363,7 +366,7 @@ export class ExcalidrawPreviewComponent implements AfterViewInit, OnChanges {
 
     // Redessiner le canvas
     this.renderContent();
-  }
+  }*/
 
   /**
    * Gestionnaire de mouse up pour arrêter le drag
@@ -378,7 +381,7 @@ export class ExcalidrawPreviewComponent implements AfterViewInit, OnChanges {
     this.selectedElement = null;
   }
 
-  private renderContent(): void {
+  /*private renderContent(): void {
     if (!this.isBrowser || !this.canvasRef) {
       console.warn('Canvas non disponible');
       return;
@@ -405,7 +408,7 @@ export class ExcalidrawPreviewComponent implements AfterViewInit, OnChanges {
       this.hasContent = false;
       this.previewTitle = 'Prévisualisation';
     }
-  }
+  }*/
 
   zoomIn(): void {
     if (!this.isBrowser || !this.hasContent) return;
@@ -467,5 +470,49 @@ export class ExcalidrawPreviewComponent implements AfterViewInit, OnChanges {
     link.href = dataUrl;
     link.download = 'preview.png';
     link.click();
+  }
+  private renderContent(): void {
+    requestAnimationFrame(() => {
+      if (this.group) {
+        this.canvasRenderer.renderGroup(this.group);
+        this.hasContent = true;
+      } else if (this.groups && this.groups.length > 0) {
+        this.canvasRenderer.renderLibrary(this.groups);
+        this.hasContent = true;
+      } else if (this.library && this.library.libraryItems.length > 0) {
+        const groups = this.library.libraryItems.map((item) => ({
+          name: item.id,
+          elements: item.elements,
+          boundElements: null,
+        }));
+        this.canvasRenderer.renderLibrary(groups);
+        this.hasContent = true;
+      } else {
+        this.hasContent = false;
+      }
+    });
+  }
+
+  // Débounce pour les événements de drag - Version corrigée
+  private debounceTimer: any;
+  onMouseMove(event: MouseEvent): void {
+    if (!this.isDragging || !this.selectedElement) return;
+
+    // Stocker les valeurs avant le setTimeout
+    const element = this.selectedElement;
+    const dx = event.clientX - this.dragStartX;
+    const dy = event.clientY - this.dragStartY;
+    const newX = this.elementStartX + dx;
+    const newY = this.elementStartY + dy;
+
+    clearTimeout(this.debounceTimer);
+    this.debounceTimer = setTimeout(() => {
+      // Vérifier que l'élément existe toujours
+      if (element) {
+        element.x = newX;
+        element.y = newY;
+        this.renderContent();
+      }
+    }, 16); // ~60 FPS
   }
 }

@@ -1,6 +1,6 @@
 // app.component.ts - Version avec initialisation correcte
 import { CommonModule } from '@angular/common';
-import { Component, effect, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, OnInit, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -39,10 +39,12 @@ import { ThemeService } from './core/services/theme.service';
 import { DocsComponent } from './features/docs/docs.component';
 import { StatisticsComponent } from "./features/statistics/statistics.component";
 import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-preview/excalidraw-preview.component';
+import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
 
 @Component({
   selector: 'app-root',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     FormsModule,
@@ -67,6 +69,7 @@ import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-previ
     ExcalidrawPreviewComponent,
     DocsComponent,
     StatisticsComponent,
+    FormatItemNamePipe,
   ],
   template: `
     <div class="app-container">
@@ -302,7 +305,7 @@ import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-previ
                   @for (item of library.libraryItems; track item.id) {
                     <mat-card class="library-item">
                       <mat-card-header>
-                        <mat-card-title>{{ formatItemName(item.id) }}</mat-card-title>
+                        <mat-card-title>{{ item.id | formatItemName }}</mat-card-title>
                         <mat-card-subtitle>{{ item.elements.length }} éléments</mat-card-subtitle>
                       </mat-card-header>
                       <mat-card-actions>

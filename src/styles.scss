@@ -176,4 +176,52 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+// Animation de fondu
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Animation de glissement
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+// Animation de zoom
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Appliquer aux éléments
+.component-card,
+.template-card {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.dialog-container {
+  animation: zoomIn 0.3s ease-out;
+}
+
+.tab-content {
+  animation: fadeInUp 0.3s ease-out;
+}
 /* You can add global styles to this file, and also import other style files */
