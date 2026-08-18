@@ -35,4 +35,145 @@ body {
   margin: 0;
   height: 100%;
 }
+// Animations pour les cartes
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.component-card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+// Transition pour les boutons
+button {
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Scrollbar personnalisée globale
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+
+  &:hover {
+    background: #555;
+  }
+}
+
+// styles.scss - Ajouter les styles pour le thème
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+// Variables CSS pour le thème
+:root {
+  --background-color: #fafafa;
+  --text-color: #333333;
+  --card-background: #ffffff;
+  --border-color: #e0e0e0;
+}
+
+// Thème sombre
+body.dark-theme {
+  --background-color: #1e1e1e;
+  --text-color: #ffffff;
+  --card-background: #2d2d2d;
+  --border-color: #444444;
+
+  background-color: var(--background-color);
+  color: var(--text-color);
+
+  .content {
+    background-color: #1e1e1e !important;
+  }
+
+  .component-card,
+  .template-card,
+  .library-item {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+  }
+
+  mat-card-title,
+  mat-card-subtitle,
+  h1, h2, h3, h4 {
+    color: #ffffff !important;
+  }
+}
+
+// Thème clair
+body.light-theme {
+  --background-color: #fafafa;
+  --text-color: #333333;
+  --card-background: #ffffff;
+  --border-color: #e0e0e0;
+
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+// Styles globaux
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+// Animations globales
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.component-card,
+.template-card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+// Scrollbar personnalisée
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
 /* You can add global styles to this file, and also import other style files */

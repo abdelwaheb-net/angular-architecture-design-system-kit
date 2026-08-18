@@ -1,4 +1,7 @@
-// component-types.enum.ts
+// component-types.enum.ts - Version complète et corrigée
+
+// ============ ENUMS ============
+
 export enum ComponentType {
   // Angular Components
   STANDALONE_COMPONENT = 'standalone-component',
@@ -87,20 +90,8 @@ export enum ElementShape {
   LINE = 'line',
 }
 
-export enum BorderStyle {
-  SOLID = 'solid',
-  DASHED = 'dashed',
-  DOTTED = 'dotted',
-}
+// ============ INTERFACES ============
 
-export enum FillStyle {
-  SOLID = 'solid',
-  HACHURE = 'hachure',
-  CROSS_HATCH = 'cross-hatch',
-  ZIGZAG = 'zigzag',
-}
-
-// Interface pour les métadonnées des composants
 export interface ComponentMetadata {
   type: ComponentType;
   category: ComponentCategory;
@@ -110,7 +101,8 @@ export interface ComponentMetadata {
   supportedShapes: ElementShape[];
 }
 
-// Helper functions
+// ============ HELPER FUNCTIONS ============
+
 export function getComponentCategory(type: ComponentType): ComponentCategory {
   if (
     type.startsWith('standalone') ||
@@ -155,7 +147,7 @@ export function getComponentCategory(type: ComponentType): ComponentCategory {
 }
 
 export function getComponentIcon(type: ComponentType): string {
-  const iconMap: Record<ComponentType, string> = {
+  const iconMap: Record<string, string> = {
     [ComponentType.STANDALONE_COMPONENT]: '📦',
     [ComponentType.SMART_COMPONENT]: '🧠',
     [ComponentType.PRESENTATIONAL_COMPONENT]: '🎨',
@@ -209,7 +201,7 @@ export function getComponentIcon(type: ComponentType): string {
 }
 
 export function getComponentDescription(type: ComponentType): string {
-  const descriptionMap: Record<ComponentType, string> = {
+  const descriptionMap: Record<string, string> = {
     [ComponentType.STANDALONE_COMPONENT]: 'Composant autonome moderne',
     [ComponentType.SMART_COMPONENT]: 'Composant avec logique métier',
     [ComponentType.PRESENTATIONAL_COMPONENT]: 'Composant de présentation pure',
@@ -262,15 +254,143 @@ export function getComponentDescription(type: ComponentType): string {
   return descriptionMap[type] || 'Élément Angular';
 }
 
-// Constante pour la liste complète des composants
-export const COMPONENT_CATALOG: ComponentMetadata[] = Object.values(ComponentType).map((type) => ({
-  type,
-  category: getComponentCategory(type),
-  icon: getComponentIcon(type),
-  defaultName: type
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' '),
-  description: getComponentDescription(type),
-  supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
-}));
+// ============ CATALOGUE DES COMPOSANTS ============
+
+export const COMPONENT_CATALOG: ComponentMetadata[] = [
+  {
+    type: ComponentType.STANDALONE_COMPONENT,
+    category: ComponentCategory.COMPONENTS,
+    icon: '📦',
+    defaultName: 'Standalone Component',
+    description: 'Composant autonome moderne',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.SMART_COMPONENT,
+    category: ComponentCategory.COMPONENTS,
+    icon: '🧠',
+    defaultName: 'Smart Component',
+    description: 'Composant avec logique métier',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.PRESENTATIONAL_COMPONENT,
+    category: ComponentCategory.COMPONENTS,
+    icon: '🎨',
+    defaultName: 'Presentational Component',
+    description: 'Composant de présentation pure',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.SIGNAL_COMPONENT,
+    category: ComponentCategory.SIGNALS,
+    icon: '⚡',
+    defaultName: 'Signal Component',
+    description: 'Composant avec Signals',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.INJECTABLE_SERVICE,
+    category: ComponentCategory.SERVICES,
+    icon: '🔧',
+    defaultName: 'Angular Service',
+    description: 'Service injectable',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.HTTP_SERVICE,
+    category: ComponentCategory.SERVICES,
+    icon: '🌐',
+    defaultName: 'HTTP Service',
+    description: 'Service HTTP avec HttpClient',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.ROUTE_NODE,
+    category: ComponentCategory.ROUTING,
+    icon: '🛣️',
+    defaultName: 'Route Angular',
+    description: 'Route Angular standard',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.ROUTE_GUARD,
+    category: ComponentCategory.ROUTING,
+    icon: '🛡️',
+    defaultName: 'Route Guard',
+    description: 'Protection de route',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.SIGNAL,
+    category: ComponentCategory.SIGNALS,
+    icon: '⚡',
+    defaultName: 'Signal',
+    description: 'Signal Angular réactif',
+    supportedShapes: [ElementShape.ELLIPSE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.SUBJECT,
+    category: ComponentCategory.RXJS,
+    icon: '📢',
+    defaultName: 'Subject RxJS',
+    description: 'Subject pour flux de données',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.NGRX_STORE,
+    category: ComponentCategory.STATE_MANAGEMENT,
+    icon: '🏪',
+    defaultName: 'NgRx Store',
+    description: "Store pour la gestion d'état",
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.MATERIAL_CARD,
+    category: ComponentCategory.UI_KIT,
+    icon: '🃏',
+    defaultName: 'Material Card',
+    description: 'Carte Material Design',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.MODULE,
+    category: ComponentCategory.ARCHITECTURE,
+    icon: '📦',
+    defaultName: 'Angular Module',
+    description: 'Module Angular (NgModule)',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.MICRO_FRONTEND,
+    category: ComponentCategory.ARCHITECTURE,
+    icon: '🧩',
+    defaultName: 'Micro Frontend',
+    description: 'Architecture micro-frontend',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.REST_API,
+    category: ComponentCategory.ECOSYSTEM,
+    icon: '🔌',
+    defaultName: 'REST API',
+    description: 'API RESTful',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.DATABASE,
+    category: ComponentCategory.ECOSYSTEM,
+    icon: '🗃️',
+    defaultName: 'Database',
+    description: 'Base de données',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+  {
+    type: ComponentType.DEVOPS_PIPELINE,
+    category: ComponentCategory.ECOSYSTEM,
+    icon: '🚀',
+    defaultName: 'DevOps Pipeline',
+    description: 'Pipeline CI/CD',
+    supportedShapes: [ElementShape.RECTANGLE, ElementShape.TEXT],
+  },
+];
