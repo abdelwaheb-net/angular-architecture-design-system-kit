@@ -1,0 +1,65 @@
+{
+  "APP": {
+    "TITLE": "Angular Architecture Kit",
+    "LOGO": "🚀 Angular Architecture Kit"
+  },
+  "TOOLBAR": {
+    "GENERATE": "Générer",
+    "GENERATING": "Génération...",
+    "GENERATE_ALL": "Générer tout",
+    "EXPORT": "Exporter",
+    "IMPORT": "Importer",
+    "TEMPLATES": "Templates",
+    "DOCUMENTATION": "Documentation",
+    "EDITOR": "Éditeur",
+    "THEME": "Changer de thème",
+    "SHARE": "Partager",
+    "COPY_LINK": "Copier le lien"
+  },
+  "TABS": {
+    "COMPONENTS": "Composants",
+    "TEMPLATES": "Templates",
+    "PREVIEW": "Prévisualisation",
+    "LIBRARY": "Bibliothèque",
+    "EXPORT": "Export",
+    "DOCUMENTATION": "Documentation",
+    "STATISTICS": "Statistiques"
+  },
+  "COMPONENTS": {
+    "TITLE": "📦 Composants disponibles",
+    "SEARCH_PLACEHOLDER": "Rechercher...",
+    "ALL_CATEGORIES": "Toutes les catégories",
+    "ADD": "Ajouter",
+    "PREVIEW": "Aperçu",
+    "FAVORITE": "Ajouter aux favoris"
+  },
+  "PREVIEW": {
+    "TITLE": "👁️ Prévisualisation",
+    "TYPE": "Type",
+    "SINGLE_ELEMENT": "Élément unique",
+    "FULL_LIBRARY": "Bibliothèque complète",
+    "SELECT_COMPONENT": "Sélectionner",
+    "NO_CONTENT": "Sélectionnez un composant ou générez une bibliothèque"
+  },
+  "LIBRARY": {
+    "TITLE": "📚 Bibliothèque",
+    "EMPTY": "Aucune bibliothèque. Cliquez sur Générer.",
+    "CLEAR": "Vider",
+    "DELETE": "Supprimer"
+  },
+  "EXPORT": {
+    "TITLE": "💾 Export",
+    "FILENAME": "Nom du fichier",
+    "DOWNLOAD_EXCALIDRAW": "Télécharger .excalidrawlib",
+    "EXPORT_SVG": "Exporter en SVG",
+    "EXPORT_PDF": "Exporter en PDF",
+    "COPY_JSON": "Copier JSON"
+  },
+  "MESSAGES": {
+    "LIBRARY_GENERATED": "Bibliothèque générée",
+    "LINK_COPIED": "Lien copié",
+    "THEME_CHANGED": "Thème changé",
+    "COMPONENT_ADDED": "Composant ajouté",
+    "LIBRARY_CLEARED": "Bibliothèque vidée"
+  }
+}
