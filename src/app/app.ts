@@ -21,6 +21,7 @@ import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+
 import { ARCHITECTURE_TEMPLATES, ArchitectureTemplate } from './core/constants/templates.constants';
 import {
   COMPONENT_CATALOG,
@@ -30,6 +31,7 @@ import {
 import { ExcalidrawGroup, ExcalidrawLibrary } from './core/models/excalidraw-element.model';
 import { FileExportService } from './core/services/file-export.service';
 import { KeyboardShortcutsService } from './core/services/keyboard-shortcuts.service';
+import { LanguageService } from './core/services/language.service';
 import { LibraryGeneratorService } from './core/services/library-generator.service';
 import { PdfExportService } from './core/services/pdf-export.service';
 import { ShareService } from './core/services/share.service';
@@ -40,6 +42,8 @@ import { DocsComponent } from './features/docs/docs.component';
 import { StatisticsComponent } from "./features/statistics/statistics.component";
 import { ExcalidrawPreviewComponent } from './shared/components/excalidraw-preview/excalidraw-preview.component';
 import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
+import { TranslatePipe } from './shared/pipes/translate.pipe';
+
 
 @Component({
   selector: 'app-root',
@@ -70,6 +74,7 @@ import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
     DocsComponent,
     StatisticsComponent,
     FormatItemNamePipe,
+    TranslatePipe,
   ],
   template: `
     <div class="app-container">
@@ -77,11 +82,19 @@ import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
       <mat-toolbar color="primary">
         <span class="logo">🚀 Angular Architecture Kit</span>
         <span class="spacer"></span>
+        <!-- Bouton de langue -->
+        <button mat-icon-button (click)="toggleLanguage()">
+          <mat-icon>language</mat-icon>
+          <span>{{ languageService.currentLanguage() | uppercase }}</span>
+        </button>
 
+        <!-- Utiliser le pipe -->
+        <!-- <h2>{{ 'COMPONENTS.TITLE' | t }}</h2>
+        <button>{{ 'TOOLBAR.GENERATE' | t }}</button> -->
         <!-- Bouton Partager -->
         <button
           mat-icon-button
-          matTooltip="Partager"
+          matTooltip="{{ 'TOOLBAR.SHARE' | t }}"
           (click)="openShareDialog()"
           [disabled]="!generatorService.currentLibrary()"
         >
@@ -91,7 +104,7 @@ import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
         <!-- Bouton Copier le lien -->
         <button
           mat-icon-button
-          matTooltip="Copier le lien"
+          matTooltip="{{ 'TOOLBAR.COPY_LINK' | t }}"
           (click)="copyShareLink()"
           [disabled]="!generatorService.currentLibrary()"
         >
@@ -99,15 +112,19 @@ import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
         </button>
 
         <!-- Bouton Documentation -->
-        <button mat-icon-button matTooltip="Documentation" (click)="openDocs()">
+        <button mat-icon-button matTooltip="{{ 'TOOLBAR.DOCUMENTATION' | t }}" (click)="openDocs()">
           <mat-icon>help</mat-icon>
         </button>
 
-        <button mat-icon-button matTooltip="Documentation" (click)="openDocs()">
+        <button mat-icon-button matTooltip="{{ 'TOOLBAR.DOCUMENTATION' | t }}" (click)="openDocs()">
           <mat-icon>help</mat-icon>
         </button>
 
-        <button mat-icon-button matTooltip="Éditeur" (click)="openElementEditor()">
+        <button
+          mat-icon-button
+          matTooltip="{{ 'TOOLBAR.EDITOR' | t }}"
+          (click)="openElementEditor()"
+        >
           <mat-icon>edit</mat-icon>
         </button>
 
@@ -123,9 +140,9 @@ import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
         >
           <mat-icon>refresh</mat-icon>
           @if (generatorService.isGenerating()) {
-            Génération...
+            {{ 'TOOLBAR.GENERATING' | t }}
           } @else {
-            Générer
+            {{ 'TOOLBAR.GENERATE' | t }}
           }
         </button>
 
@@ -135,7 +152,7 @@ import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
           matTooltip="Exporter (Ctrl+E)"
           [disabled]="!generatorService.currentLibrary()"
         >
-          <mat-icon>download</mat-icon> Exporter
+          <mat-icon>download</mat-icon> {{ 'TOOLBAR.EXPORT' | t }}
         </button>
       </mat-toolbar>
 
@@ -143,9 +160,9 @@ import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
       <main class="content">
         <mat-tab-group #tabGroup>
           <!-- Onglet Composants -->
-          <mat-tab label="Composants">
+          <mat-tab label="{{ 'TABS.COMPONENTS' | t }}">
             <div class="tab-content">
-              <h2>📦 Composants disponibles</h2>
+              <h2>{{ 'COMPONENTS.TITLE' | t }}</h2>
 
               <div class="component-header">
                 <mat-form-field appearance="outline" class="search-field">
@@ -202,7 +219,7 @@ import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
           </mat-tab>
 
           <!-- Onglet Templates -->
-          <mat-tab label="Templates">
+          <mat-tab label="{{ 'TABS.TEMPLATES' | t }}">
             <div class="tab-content">
               <h2>🏗️ Templates d'architecture</h2>
 
@@ -225,7 +242,7 @@ import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
                         color="primary"
                         (click)="generateTemplate(template)"
                       >
-                        <mat-icon>play_arrow</mat-icon> Générer
+                        <mat-icon>play_arrow</mat-icon> {{ 'TOOLBAR.GENERATE' | t }}
                       </button>
                     </mat-card-actions>
                   </mat-card>
@@ -235,7 +252,7 @@ import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
           </mat-tab>
 
           <!-- Onglet Prévisualisation -->
-          <mat-tab label="Prévisualisation">
+          <mat-tab label="{{ 'TABS.PREVIEW' | t }}">
             <div class="tab-content">
               <h2>👁️ Prévisualisation</h2>
 
@@ -277,7 +294,7 @@ import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
           </mat-tab>
 
           <!-- Onglet Bibliothèque -->
-          <mat-tab label="Bibliothèque">
+          <mat-tab label="{{ 'TABS.LIBRARY' | t }}">
             <div class="tab-content">
               <div class="library-header">
                 <h2>📚 Bibliothèque</h2>
@@ -328,7 +345,7 @@ import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
           </mat-tab>
 
           <!-- Onglet Export -->
-          <mat-tab label="Export">
+          <mat-tab label="{{ 'TABS.EXPORT' | t }}">
             <div class="tab-content">
               <h2>💾 Export de la bibliothèque</h2>
 
@@ -386,10 +403,10 @@ import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
           </mat-tab>
 
           <!-- Onglet Documentation -->
-          <mat-tab label="Documentation">
+          <mat-tab label="{{ 'TABS.DOCUMENTATION' | t }}">
             <app-docs></app-docs>
           </mat-tab>
-          <mat-tab label="Statistiques">
+          <mat-tab label="{{ 'TABS.STATISTICS' | t }}">
             <app-statistics></app-statistics>
           </mat-tab>
         </mat-tab-group>
@@ -517,6 +534,11 @@ import { FormatItemNamePipe } from "./shared/pipes/format-item-name.pipe";
           min-width: 200px;
         }
       }
+      .language-indicator {
+        font-size: 0.7rem;
+        font-weight: bold;
+        margin-left: 2px;
+      }
     `,
   ],
 })
@@ -553,6 +575,7 @@ export class AppComponent implements OnInit {
     private svgExportService: SvgExportService,
     private pdfExportService: PdfExportService,
     private shareService: ShareService,
+    public languageService: LanguageService,
   ) {
     console.log('=== AppComponent initialisé ===');
     console.log('Composants:', this.availableComponents.length);
@@ -1087,6 +1110,11 @@ export class AppComponent implements OnInit {
         console.error("❌ Erreur lors de l'ouverture du dialogue:", error);
         this.showSnackBar("❌ Erreur lors de l'ouverture du dialogue", 'error');
       });
+  }
+  toggleLanguage(): void {
+    this.languageService.toggleLanguage();
+    const lang = this.languageService.currentLanguage();
+    console.log(`🌍 Langue changée: ${lang}`);
   }
 }
 export { AppComponent as App };
