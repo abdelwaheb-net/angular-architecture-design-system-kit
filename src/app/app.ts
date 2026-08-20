@@ -166,7 +166,7 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
 
               <div class="component-header">
                 <mat-form-field appearance="outline" class="search-field">
-                  <mat-label>Rechercher</mat-label>
+                  <mat-label>{{ 'COMPONENTS.SEARCH_PLACEHOLDER' | t }}</mat-label>
                   <input
                     matInput
                     [(ngModel)]="searchTerm"
@@ -178,7 +178,7 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
                 <mat-form-field appearance="outline" class="category-field">
                   <mat-label>Catégorie</mat-label>
                   <mat-select [(ngModel)]="selectedFilterCategory">
-                    <mat-option value="all">Toutes les catégories</mat-option>
+                    <mat-option value="all">{{ 'COMPONENTS.ALL_CATEGORIES' | t }}</mat-option>
                     <mat-option value="Components">Components</mat-option>
                     <mat-option value="Services">Services</mat-option>
                     <mat-option value="Routing">Routing</mat-option>
@@ -206,10 +206,10 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
 
                     <mat-card-actions>
                       <button mat-raised-button color="primary" (click)="addComponent(component)">
-                        <mat-icon>add</mat-icon> Ajouter
+                        <mat-icon>add</mat-icon> {{ 'COMPONENTS.ADD' | t }}
                       </button>
                       <button mat-button (click)="previewComponent(component)">
-                        <mat-icon>visibility</mat-icon> Aperçu
+                        <mat-icon>visibility</mat-icon> {{ 'COMPONENTS.PREVIEW' | t }}
                       </button>
                     </mat-card-actions>
                   </mat-card>
@@ -254,17 +254,17 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
           <!-- Onglet Prévisualisation -->
           <mat-tab label="{{ 'TABS.PREVIEW' | t }}">
             <div class="tab-content">
-              <h2>👁️ Prévisualisation</h2>
+              <h2>{{ 'PREVIEW.TITLE' | t }}</h2>
 
               <div class="preview-controls">
                 <mat-form-field appearance="fill">
-                  <mat-label>Type</mat-label>
+                  <mat-label>{{ 'PREVIEW.TYPE' | t }}</mat-label>
                   <mat-select
                     [(ngModel)]="previewMode"
                     (ngModelChange)="onPreviewModeChange($event)"
                   >
-                    <mat-option value="single">Élément unique</mat-option>
-                    <mat-option value="library">Bibliothèque complète</mat-option>
+                    <mat-option value="single">{{ 'PREVIEW.SINGLE_ELEMENT' | t }}</mat-option>
+                    <mat-option value="library">{{ 'PREVIEW.FULL_LIBRARY' | t }}</mat-option>
                   </mat-select>
                 </mat-form-field>
 
@@ -297,11 +297,11 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
           <mat-tab label="{{ 'TABS.LIBRARY' | t }}">
             <div class="tab-content">
               <div class="library-header">
-                <h2>📚 Bibliothèque</h2>
+                <h2>{{ 'LIBRARY.TITLE' | t }}</h2>
 
                 @if (generatorService.currentLibrary()) {
                   <button mat-raised-button color="warn" (click)="clearLibrary()">
-                    <mat-icon>delete</mat-icon> Vider la bibliothèque
+                    <mat-icon>delete</mat-icon> {{ 'LIBRARY.CLEAR' | t }}
                   </button>
                 }
               </div>
@@ -330,7 +330,7 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
                           <mat-icon>visibility</mat-icon>
                         </button>
                         <button mat-icon-button (click)="removeItem(item.id)">
-                          <mat-icon>delete</mat-icon>
+                          <mat-icon>{{ 'LIBRARY.DELETE' | t }}</mat-icon>
                         </button>
                       </mat-card-actions>
                     </mat-card>
@@ -338,7 +338,8 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
                 </div>
               } @else {
                 <p class="empty-state">
-                  Aucune bibliothèque générée. Cliquez sur "Générer" pour commencer.
+                  <!-- Aucune bibliothèque générée. Cliquez sur "Générer" pour commencer. -->
+                  {{ 'LIBRARY.EMPTY' | t }}
                 </p>
               }
             </div>
@@ -347,33 +348,33 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
           <!-- Onglet Export -->
           <mat-tab label="{{ 'TABS.EXPORT' | t }}">
             <div class="tab-content">
-              <h2>💾 Export de la bibliothèque</h2>
+              <h2>{{ 'EXPORT.TITLE' | t }}</h2>
 
               <div class="export-options">
                 <mat-form-field appearance="fill" class="full-width">
-                  <mat-label>Nom du fichier</mat-label>
+                  <mat-label>{{ 'EXPORT.FILENAME' | t }}</mat-label>
                   <input matInput [(ngModel)]="exportFilename" />
                 </mat-form-field>
 
-                <h3>Formats disponibles :</h3>
+                <h3>{{ 'EXPORT.FORMATS_TITLE' | t }}</h3>
 
                 <div class="export-actions">
                   <!-- Export Excalidraw -->
                   <button mat-raised-button color="primary" (click)="exportLibrary()">
                     <mat-icon>download</mat-icon>
-                    Télécharger .excalidrawlib
+                    {{ 'EXPORT.DOWNLOAD_EXCALIDRAW' | t }}
                   </button>
 
                   <!-- Export SVG -->
                   <button mat-raised-button color="accent" (click)="exportToSVG()">
                     <mat-icon>brush</mat-icon>
-                    Exporter en SVG
+                    {{ 'EXPORT.EXPORT_SVG' | t }}
                   </button>
 
                   <!-- Export PDF -->
                   <button mat-raised-button color="warn" (click)="exportLibraryToPDF()">
                     <mat-icon>picture_as_pdf</mat-icon>
-                    Exporter en PDF
+                    {{ 'EXPORT.EXPORT_PDF' | t }}
                   </button>
 
                   <!-- Export PDF de la prévisualisation -->
@@ -395,7 +396,7 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
                   <!-- Copier JSON -->
                   <button mat-raised-button (click)="copyToClipboard()">
                     <mat-icon>content_copy</mat-icon>
-                    Copier JSON
+                    {{ 'EXPORT.COPY_JSON' | t }}
                   </button>
                 </div>
               </div>
@@ -626,7 +627,7 @@ export class AppComponent implements OnInit {
   generateLibrary(): void {
     console.log('Génération de la bibliothèque...');
     this.generatorService.generateLibrary();
-    this.showSnackBar('✅ Bibliothèque générée');
+    this.showSnackBar(this.languageService.translate('MESSAGES.LIBRARY_GENERATED'));
   }
 
   generateFullLibrary(): void {
@@ -807,7 +808,7 @@ export class AppComponent implements OnInit {
       this.previewLibrary = null;
       this.previewGroup = null;
       this.previewGroups = [];
-      this.showSnackBar('🗑️ Bibliothèque vidée');
+      this.showSnackBar(this.languageService.translate('MESSAGES.LIBRARY_CLEARED'));
     }
   }
 
@@ -982,7 +983,7 @@ export class AppComponent implements OnInit {
     }
 
     this.shareService.copyShareLink(library).then(() => {
-      this.showSnackBar('✅ Lien copié dans le presse-papier');
+      this.showSnackBar(this.languageService.translate('MESSAGES.LINK_COPIED'));
     });
   }
 
@@ -1115,6 +1116,16 @@ export class AppComponent implements OnInit {
     this.languageService.toggleLanguage();
     const lang = this.languageService.currentLanguage();
     console.log(`🌍 Langue changée: ${lang}`);
+  }
+
+  // Dans AppComponent, ajouter cette méthode
+
+  private t(key: string): string {
+    return this.languageService.translate(key);
+  }
+
+  private tp(key: string, params: Record<string, string>): string {
+    return this.languageService.translateWithParams(key, params);
   }
 }
 export { AppComponent as App };

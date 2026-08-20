@@ -27,39 +27,194 @@
   },
   "COMPONENTS": {
     "TITLE": "📦 Composants disponibles",
-    "SEARCH_PLACEHOLDER": "Rechercher...",
+    "SEARCH_PLACEHOLDER": "Rechercher des composants...",
     "ALL_CATEGORIES": "Toutes les catégories",
     "ADD": "Ajouter",
     "PREVIEW": "Aperçu",
-    "FAVORITE": "Ajouter aux favoris"
+    "FAVORITE": "Ajouter aux favoris",
+    "UNFAVORITE": "Retirer des favoris",
+    "DESCRIPTIONS": {
+      "STANDALONE": "Composant autonome moderne",
+      "SMART": "Composant avec logique métier",
+      "PRESENTATIONAL": "Composant de présentation pure",
+      "SIGNAL": "Composant avec Signals",
+      "LAYOUT": "Composant de mise en page",
+      "FEATURE": "Composant fonctionnel",
+      "INJECTABLE": "Service injectable",
+      "HTTP": "Service HTTP",
+      "FACADE": "Service façade",
+      "REPOSITORY": "Service repository",
+      "UTILITY": "Service utilitaire",
+      "ROUTE": "Route Angular",
+      "CHILD_ROUTE": "Route enfant",
+      "LAZY_ROUTE": "Route lazy-loaded",
+      "GUARD": "Garde de route",
+      "RESOLVER": "Resolveur de route",
+      "OUTLET": "Sortie de routeur",
+      "SIGNAL": "Signal Angular",
+      "COMPUTED_SIGNAL": "Signal calculé",
+      "SUBJECT": "Subject RxJS",
+      "NGRX_STORE": "Store NgRx",
+      "MATERIAL_CARD": "Carte Material",
+      "MODULE": "Module Angular",
+      "MICRO_FRONTEND": "Micro frontend",
+      "REST_API": "API REST",
+      "DATABASE": "Base de données",
+      "DEVOPS": "Pipeline DevOps"
+    }
+  },
+  "TEMPLATES": {
+    "TITLE": "🏗️ Templates d'architecture",
+    "GENERATE": "Générer",
+    "COMPONENTS_INCLUDED": "Composants inclus",
+    "DESCRIPTIONS": {
+      "ECOMMERCE": "Architecture e-commerce complète avec panier, catalogue et paiement",
+      "DASHBOARD": "Architecture pour tableau de bord avec visualisation en temps réel",
+      "MICRO_FRONTEND": "Architecture micro-frontend avec Module Federation",
+      "REACTIVE_FORMS": "Architecture pour formulaires réactifs complexes",
+      "REAL_TIME": "Architecture temps réel avec WebSocket et RxJS"
+    }
   },
   "PREVIEW": {
     "TITLE": "👁️ Prévisualisation",
     "TYPE": "Type",
     "SINGLE_ELEMENT": "Élément unique",
+    "MULTIPLE_ELEMENTS": "Plusieurs éléments",
     "FULL_LIBRARY": "Bibliothèque complète",
-    "SELECT_COMPONENT": "Sélectionner",
+    "SELECT_COMPONENT": "Sélectionner un composant",
+    "ZOOM_IN": "Zoom avant",
+    "ZOOM_OUT": "Zoom arrière",
+    "RESET_ZOOM": "Réinitialiser le zoom",
+    "CENTER": "Centrer",
+    "EXPORT_PNG": "Exporter en PNG",
     "NO_CONTENT": "Sélectionnez un composant ou générez une bibliothèque"
   },
   "LIBRARY": {
     "TITLE": "📚 Bibliothèque",
-    "EMPTY": "Aucune bibliothèque. Cliquez sur Générer.",
-    "CLEAR": "Vider",
-    "DELETE": "Supprimer"
+    "TOTAL_ELEMENTS": "Éléments totaux",
+    "CATEGORIES": "Catégories",
+    "FAVORITES": "Favoris",
+    "FILTER_BY_CATEGORY": "Filtrer par catégorie",
+    "EMPTY": "Aucune bibliothèque générée. Cliquez sur Générer pour commencer.",
+    "CLEAR": "Vider la bibliothèque",
+    "DELETE": "Supprimer",
+    "CONFIRM_CLEAR": "Voulez-vous vraiment vider la bibliothèque ?"
   },
   "EXPORT": {
-    "TITLE": "💾 Export",
+    "TITLE": "💾 Export de la bibliothèque",
     "FILENAME": "Nom du fichier",
+    "FORMATS_TITLE": "Formats disponibles :",
     "DOWNLOAD_EXCALIDRAW": "Télécharger .excalidrawlib",
     "EXPORT_SVG": "Exporter en SVG",
     "EXPORT_PDF": "Exporter en PDF",
+    "EXPORT_GROUP_SVG": "Exporter le groupe en SVG",
+    "EXPORT_PREVIEW_PDF": "Exporter l'aperçu en PDF",
     "COPY_JSON": "Copier JSON"
   },
+  "STATISTICS": {
+    "TITLE": "📊 Statistiques de la bibliothèque",
+    "TOTAL_COMPONENTS": "Composants totaux",
+    "TOTAL_CATEGORIES": "Catégories",
+    "TOTAL_ELEMENTS": "Éléments graphiques",
+    "BY_CATEGORY": "Répartition par catégorie",
+    "NO_DATA": "Aucune bibliothèque générée",
+    "NO_DATA_DESC": "Cliquez sur « Générer » pour créer des composants"
+  },
   "MESSAGES": {
-    "LIBRARY_GENERATED": "Bibliothèque générée",
-    "LINK_COPIED": "Lien copié",
-    "THEME_CHANGED": "Thème changé",
-    "COMPONENT_ADDED": "Composant ajouté",
-    "LIBRARY_CLEARED": "Bibliothèque vidée"
+    "LIBRARY_GENERATED": "✅ Bibliothèque générée avec succès",
+    "FULL_LIBRARY_GENERATED": "✅ Bibliothèque complète générée",
+    "TEMPLATE_GENERATED": "✅ Template « {{name}} » généré",
+    "COMPONENT_ADDED": "✅ {{name}} ajouté à la bibliothèque",
+    "COMPONENT_REMOVED": "🗑️ Composant supprimé",
+    "LIBRARY_CLEARED": "🗑️ Bibliothèque vidée",
+    "EXPORT_SUCCESS": "✅ Export réussi",
+    "EXPORT_ERROR": "❌ Erreur d'export",
+    "IMPORT_SUCCESS": "✅ Bibliothèque importée : {{count}} éléments",
+    "IMPORT_ERROR": "❌ Erreur d'import",
+    "LINK_COPIED": "✅ Lien copié dans le presse-papier",
+    "JSON_COPIED": "✅ JSON copié dans le presse-papier",
+    "THEME_CHANGED": "🌓 Thème : {{theme}}",
+    "LANGUAGE_CHANGED": "🌍 Langue : {{language}}",
+    "SAVED": "💾 Bibliothèque sauvegardée",
+    "PREVIEW_SUCCESS": "👁️ Aperçu : {{name}}",
+    "PREVIEW_ERROR": "❌ Erreur de prévisualisation",
+    "ADD_ERROR": "❌ Erreur lors de l'ajout",
+    "NO_LIBRARY": "❌ Aucune bibliothèque à exporter",
+    "NO_COMPONENT": "❌ Aucun composant sélectionné"
+  },
+  "THEME": {
+    "DARK": "Sombre",
+    "LIGHT": "Clair"
+  },
+  "LANGUAGE": {
+    "ENGLISH": "Anglais",
+    "FRENCH": "Français"
+  },
+
+  "DOCS": {
+    "TITLE": "📚 Documentation",
+    "SUBTITLE": "Guide complet pour utiliser Angular Architecture Kit",
+    "INTRODUCTION": {
+      "TITLE": "Introduction",
+      "WELCOME": "Bienvenue dans Angular Architecture Kit",
+      "DESCRIPTION": "Cette application vous permet de créer facilement des diagrammes d'architecture Angular pour vos projets.",
+      "FEATURES_TITLE": "Fonctionnalités :",
+      "FEATURE_1": "Génération de composants Angular",
+      "FEATURE_2": "Prévisualisation en temps réel",
+      "FEATURE_3": "Templates d'architecture prédéfinis",
+      "FEATURE_4": "Export vers Excalidraw",
+      "FEATURE_5": "Sauvegarde automatique",
+      "FEATURE_6": "Mode sombre",
+      "FEATURE_7": "Raccourcis clavier"
+    },
+    "QUICK_START": {
+      "TITLE": "Guide de démarrage rapide",
+      "STEP_1": "Cliquez sur « Générer » pour créer une bibliothèque de base",
+      "STEP_2": "Parcourez les composants dans l'onglet « Composants »",
+      "STEP_3": "Ajoutez des composants avec le bouton « Ajouter »",
+      "STEP_4": "Prévisualisez dans l'onglet « Prévisualisation »",
+      "STEP_5": "Exportez votre bibliothèque",
+      "CUSTOMIZATION_TITLE": "Personnalisation",
+      "CUSTOMIZATION_1": "Utilisez la recherche pour trouver des composants",
+      "CUSTOMIZATION_2": "Filtrez par catégorie",
+      "CUSTOMIZATION_3": "Ajoutez des favoris avec l'étoile ⭐",
+      "CUSTOMIZATION_4": "Générez des templates complets"
+    },
+    "SHORTCUTS": {
+      "TITLE": "Raccourcis clavier",
+      "GENERATE": "Générer la bibliothèque",
+      "EXPORT": "Ouvrir le dialogue d'export",
+      "SAVE": "Sauvegarder la bibliothèque",
+      "EXPORT_PDF": "Exporter en PDF",
+      "EXPORT_SVG": "Exporter en SVG",
+      "COPY_LINK": "Copier le lien de partage",
+      "OPEN_DOCS": "Ouvrir la documentation"
+    },
+    "API_REFERENCE": {
+      "TITLE": "Référence API",
+      "LIBRARY_SERVICE": "LibraryGeneratorService",
+      "LIBRARY_SERVICE_DESC": "Service principal pour la génération de bibliothèques.",
+      "METHODS_TITLE": "Méthodes principales :",
+      "METHOD_1": "generateLibrary() - Génère la bibliothèque de base",
+      "METHOD_2": "generateFullLibrary() - Génère tous les composants",
+      "METHOD_3": "generateArchitectureTemplate(name) - Génère un template spécifique",
+      "METHOD_4": "addComponentToLibrary(type) - Ajoute un composant",
+      "METHOD_5": "removeComponentFromLibrary(id) - Supprime un composant",
+      "METHOD_6": "exportLibrary() - Exporte en JSON",
+      "METHOD_7": "downloadLibrary(filename) - Télécharge le fichier",
+      "CANVAS_SERVICE": "CanvasRendererService",
+      "CANVAS_SERVICE_DESC": "Service pour le rendu des éléments sur canvas.",
+      "FILE_SERVICE": "FileExportService",
+      "FILE_SERVICE_DESC": "Service pour l'export/import de fichiers."
+    },
+    "TROUBLESHOOTING": {
+      "TITLE": "Dépannage",
+      "PROBLEM_1_TITLE": "Les composants n'apparaissent pas dans Excalidraw",
+      "PROBLEM_1_SOLUTION": "Vérifiez que vous importez correctement le fichier .excalidrawlib.",
+      "PROBLEM_2_TITLE": "La prévisualisation est vide",
+      "PROBLEM_2_SOLUTION": "Cliquez sur « Générer » ou « Ajouter » pour créer des composants.",
+      "PROBLEM_3_TITLE": "Le zoom ne fonctionne pas",
+      "PROBLEM_3_SOLUTION": "Utilisez la molette de la souris ou les boutons de zoom."
+    }
   }
 }

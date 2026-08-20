@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { LibraryGeneratorService } from '../../core/services/library-generator.service';
+import { TranslatePipe } from "../../shared/pipes/translate.pipe";
 
 // Interface pour les statistiques de catégorie
 interface CategoryStat {
@@ -16,10 +17,10 @@ interface CategoryStat {
 @Component({
   selector: 'app-statistics',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule],
+  imports: [CommonModule, MatCardModule, MatIconModule, TranslatePipe],
   template: `
     <div class="statistics-container">
-      <h2>📊 Statistiques de la bibliothèque</h2>
+      <h2>{{ 'STATISTICS.TITLE' | t }}</h2>
 
       @if (hasLibrary()) {
         <div class="stats-grid">
@@ -27,7 +28,7 @@ interface CategoryStat {
             <mat-card-content>
               <mat-icon>widgets</mat-icon>
               <h3>{{ totalComponents() }}</h3>
-              <p>Composants totaux</p>
+              <p>{{ 'STATISTICS.TOTAL_COMPONENTS' | t }}</p>
             </mat-card-content>
           </mat-card>
 
@@ -48,7 +49,7 @@ interface CategoryStat {
           </mat-card>
         </div>
 
-        <h3>Répartition par catégorie</h3>
+        <h3>{{ 'STATISTICS.BY_CATEGORY' | t }}</h3>
         <div class="category-stats">
           @for (category of getCategoryStats(); track category.name) {
             <mat-card class="category-stat-card">
@@ -74,8 +75,8 @@ interface CategoryStat {
       } @else {
         <div class="empty-statistics">
           <mat-icon>bar_chart</mat-icon>
-          <p>Aucune bibliothèque générée</p>
-          <p>Cliquez sur "Générer" pour créer des composants</p>
+          <p>{{ 'STATISTICS.NO_DATA' | t }}</p>
+          <p>{{ 'STATISTICS.NO_DATA_DESC' | t }}</p>
         </div>
       }
     </div>

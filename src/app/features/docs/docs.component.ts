@@ -1,21 +1,28 @@
-// docs.component.ts - Version complète
+// docs.component.ts - Version avec traduction
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-docs',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, MatCardModule, MatExpansionModule, MatIconModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatExpansionModule,
+    MatIconModule,
+    MatButtonModule,
+    TranslatePipe, // Ajouter le pipe
+  ],
   template: `
     <div class="docs-container">
       <div class="docs-header">
-        <h1>📚 Documentation</h1>
-        <p>Guide complet pour utiliser l'Angular Architecture Kit</p>
+        <h1>{{ 'DOCS.TITLE' | t }}</h1>
+        <p>{{ 'DOCS.SUBTITLE' | t }}</p>
       </div>
 
       <mat-accordion>
@@ -24,55 +31,52 @@ import { MatIconModule } from '@angular/material/icon';
           <mat-expansion-panel-header>
             <mat-panel-title>
               <mat-icon>info</mat-icon>
-              Introduction
+              {{ 'DOCS.INTRODUCTION.TITLE' | t }}
             </mat-panel-title>
           </mat-expansion-panel-header>
 
           <div class="doc-content">
-            <h3>Bienvenue dans Angular Architecture Kit</h3>
-            <p>
-              Cette application vous permet de créer facilement des diagrammes d'architecture
-              Angular pour vos projets.
-            </p>
+            <h3>{{ 'DOCS.INTRODUCTION.WELCOME' | t }}</h3>
+            <p>{{ 'DOCS.INTRODUCTION.DESCRIPTION' | t }}</p>
 
-            <h4>Fonctionnalités :</h4>
+            <h4>{{ 'DOCS.INTRODUCTION.FEATURES_TITLE' | t }}</h4>
             <ul>
-              <li>✅ Génération de composants Angular</li>
-              <li>✅ Prévisualisation en temps réel</li>
-              <li>✅ Templates d'architecture prédéfinis</li>
-              <li>✅ Export vers Excalidraw</li>
-              <li>✅ Sauvegarde automatique</li>
-              <li>✅ Mode sombre</li>
-              <li>✅ Raccourcis clavier</li>
+              <li>✅ {{ 'DOCS.INTRODUCTION.FEATURE_1' | t }}</li>
+              <li>✅ {{ 'DOCS.INTRODUCTION.FEATURE_2' | t }}</li>
+              <li>✅ {{ 'DOCS.INTRODUCTION.FEATURE_3' | t }}</li>
+              <li>✅ {{ 'DOCS.INTRODUCTION.FEATURE_4' | t }}</li>
+              <li>✅ {{ 'DOCS.INTRODUCTION.FEATURE_5' | t }}</li>
+              <li>✅ {{ 'DOCS.INTRODUCTION.FEATURE_6' | t }}</li>
+              <li>✅ {{ 'DOCS.INTRODUCTION.FEATURE_7' | t }}</li>
             </ul>
           </div>
         </mat-expansion-panel>
 
-        <!-- Guide d'utilisation -->
+        <!-- Guide de démarrage -->
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-panel-title>
               <mat-icon>build</mat-icon>
-              Guide d'utilisation rapide
+              {{ 'DOCS.QUICK_START.TITLE' | t }}
             </mat-panel-title>
           </mat-expansion-panel-header>
 
           <div class="doc-content">
-            <h4>🚀 Démarrage rapide</h4>
+            <h4>🚀 {{ 'DOCS.QUICK_START.TITLE' | t }}</h4>
             <ol>
-              <li>Cliquez sur "Générer" pour créer une bibliothèque de base</li>
-              <li>Parcourez les composants dans l'onglet "Composants"</li>
-              <li>Ajoutez des composants avec le bouton "Ajouter"</li>
-              <li>Prévisualisez dans l'onglet "Prévisualisation"</li>
-              <li>Exportez votre bibliothèque</li>
+              <li>{{ 'DOCS.QUICK_START.STEP_1' | t }}</li>
+              <li>{{ 'DOCS.QUICK_START.STEP_2' | t }}</li>
+              <li>{{ 'DOCS.QUICK_START.STEP_3' | t }}</li>
+              <li>{{ 'DOCS.QUICK_START.STEP_4' | t }}</li>
+              <li>{{ 'DOCS.QUICK_START.STEP_5' | t }}</li>
             </ol>
 
-            <h4>🎨 Personnalisation</h4>
+            <h4>🎨 {{ 'DOCS.QUICK_START.CUSTOMIZATION_TITLE' | t }}</h4>
             <ul>
-              <li>Utilisez la recherche pour trouver des composants</li>
-              <li>Filtrez par catégorie</li>
-              <li>Ajoutez des favoris avec l'étoile ⭐</li>
-              <li>Générez des templates complets</li>
+              <li>{{ 'DOCS.QUICK_START.CUSTOMIZATION_1' | t }}</li>
+              <li>{{ 'DOCS.QUICK_START.CUSTOMIZATION_2' | t }}</li>
+              <li>{{ 'DOCS.QUICK_START.CUSTOMIZATION_3' | t }}</li>
+              <li>{{ 'DOCS.QUICK_START.CUSTOMIZATION_4' | t }}</li>
             </ul>
           </div>
         </mat-expansion-panel>
@@ -82,7 +86,7 @@ import { MatIconModule } from '@angular/material/icon';
           <mat-expansion-panel-header>
             <mat-panel-title>
               <mat-icon>keyboard</mat-icon>
-              Raccourcis clavier
+              {{ 'DOCS.SHORTCUTS.TITLE' | t }}
             </mat-panel-title>
           </mat-expansion-panel-header>
 
@@ -94,31 +98,31 @@ import { MatIconModule } from '@angular/material/icon';
               </tr>
               <tr>
                 <td><kbd>Ctrl</kbd> + <kbd>G</kbd></td>
-                <td>Générer la bibliothèque</td>
+                <td>{{ 'DOCS.SHORTCUTS.GENERATE' | t }}</td>
               </tr>
               <tr>
                 <td><kbd>Ctrl</kbd> + <kbd>E</kbd></td>
-                <td>Ouvrir le dialogue d'export</td>
+                <td>{{ 'DOCS.SHORTCUTS.EXPORT' | t }}</td>
               </tr>
               <tr>
                 <td><kbd>Ctrl</kbd> + <kbd>S</kbd></td>
-                <td>Sauvegarder la bibliothèque</td>
+                <td>{{ 'DOCS.SHORTCUTS.SAVE' | t }}</td>
               </tr>
               <tr>
                 <td><kbd>Ctrl</kbd> + <kbd>P</kbd></td>
-                <td>Exporter en PDF</td>
+                <td>{{ 'DOCS.SHORTCUTS.EXPORT_PDF' | t }}</td>
               </tr>
               <tr>
                 <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></td>
-                <td>Exporter en SVG</td>
+                <td>{{ 'DOCS.SHORTCUTS.EXPORT_SVG' | t }}</td>
               </tr>
               <tr>
                 <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd></td>
-                <td>Copier le lien de partage</td>
+                <td>{{ 'DOCS.SHORTCUTS.COPY_LINK' | t }}</td>
               </tr>
               <tr>
                 <td><kbd>F1</kbd></td>
-                <td>Ouvrir la documentation</td>
+                <td>{{ 'DOCS.SHORTCUTS.OPEN_DOCS' | t }}</td>
               </tr>
             </table>
           </div>
@@ -129,32 +133,44 @@ import { MatIconModule } from '@angular/material/icon';
           <mat-expansion-panel-header>
             <mat-panel-title>
               <mat-icon>code</mat-icon>
-              API Reference
+              {{ 'DOCS.API_REFERENCE.TITLE' | t }}
             </mat-panel-title>
           </mat-expansion-panel-header>
 
           <div class="doc-content">
-            <h4>LibraryGeneratorService</h4>
-            <p>Service principal pour la génération de bibliothèques.</p>
+            <h4>{{ 'DOCS.API_REFERENCE.LIBRARY_SERVICE' | t }}</h4>
+            <p>{{ 'DOCS.API_REFERENCE.LIBRARY_SERVICE_DESC' | t }}</p>
 
-            <h5>Méthodes principales :</h5>
+            <h5>{{ 'DOCS.API_REFERENCE.METHODS_TITLE' | t }}</h5>
             <ul>
-              <li><code>generateLibrary()</code> - Génère la bibliothèque de base</li>
-              <li><code>generateFullLibrary()</code> - Génère tous les composants</li>
               <li>
-                <code>generateArchitectureTemplate(name)</code> - Génère un template spécifique
+                <code>{{ 'DOCS.API_REFERENCE.METHOD_1' | t }}</code>
               </li>
-              <li><code>addComponentToLibrary(type)</code> - Ajoute un composant</li>
-              <li><code>removeComponentFromLibrary(id)</code> - Supprime un composant</li>
-              <li><code>exportLibrary()</code> - Exporte en JSON</li>
-              <li><code>downloadLibrary(filename)</code> - Télécharge le fichier</li>
+              <li>
+                <code>{{ 'DOCS.API_REFERENCE.METHOD_2' | t }}</code>
+              </li>
+              <li>
+                <code>{{ 'DOCS.API_REFERENCE.METHOD_3' | t }}</code>
+              </li>
+              <li>
+                <code>{{ 'DOCS.API_REFERENCE.METHOD_4' | t }}</code>
+              </li>
+              <li>
+                <code>{{ 'DOCS.API_REFERENCE.METHOD_5' | t }}</code>
+              </li>
+              <li>
+                <code>{{ 'DOCS.API_REFERENCE.METHOD_6' | t }}</code>
+              </li>
+              <li>
+                <code>{{ 'DOCS.API_REFERENCE.METHOD_7' | t }}</code>
+              </li>
             </ul>
 
-            <h4>CanvasRendererService</h4>
-            <p>Service pour le rendu des éléments sur canvas.</p>
+            <h4>{{ 'DOCS.API_REFERENCE.CANVAS_SERVICE' | t }}</h4>
+            <p>{{ 'DOCS.API_REFERENCE.CANVAS_SERVICE_DESC' | t }}</p>
 
-            <h4>FileExportService</h4>
-            <p>Service pour l'export/import de fichiers.</p>
+            <h4>{{ 'DOCS.API_REFERENCE.FILE_SERVICE' | t }}</h4>
+            <p>{{ 'DOCS.API_REFERENCE.FILE_SERVICE_DESC' | t }}</p>
           </div>
         </mat-expansion-panel>
 
@@ -163,21 +179,19 @@ import { MatIconModule } from '@angular/material/icon';
           <mat-expansion-panel-header>
             <mat-panel-title>
               <mat-icon>warning</mat-icon>
-              Dépannage
+              {{ 'DOCS.TROUBLESHOOTING.TITLE' | t }}
             </mat-panel-title>
           </mat-expansion-panel-header>
 
           <div class="doc-content">
-            <h4>Problèmes courants</h4>
+            <h4>{{ 'DOCS.TROUBLESHOOTING.PROBLEM_1_TITLE' | t }}</h4>
+            <p>{{ 'DOCS.TROUBLESHOOTING.PROBLEM_1_SOLUTION' | t }}</p>
 
-            <h5>Les composants ne s'affichent pas dans Excalidraw</h5>
-            <p>Vérifiez que vous importez correctement le fichier .excalidrawlib.</p>
+            <h4>{{ 'DOCS.TROUBLESHOOTING.PROBLEM_2_TITLE' | t }}</h4>
+            <p>{{ 'DOCS.TROUBLESHOOTING.PROBLEM_2_SOLUTION' | t }}</p>
 
-            <h5>La prévisualisation est vide</h5>
-            <p>Cliquez sur "Générer" ou "Ajouter" pour créer des composants.</p>
-
-            <h5>Le zoom ne fonctionne pas</h5>
-            <p>Utilisez la molette de la souris ou les boutons de zoom.</p>
+            <h4>{{ 'DOCS.TROUBLESHOOTING.PROBLEM_3_TITLE' | t }}</h4>
+            <p>{{ 'DOCS.TROUBLESHOOTING.PROBLEM_3_SOLUTION' | t }}</p>
           </div>
         </mat-expansion-panel>
       </mat-accordion>
