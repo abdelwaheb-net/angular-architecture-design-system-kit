@@ -31,35 +31,190 @@
     "ALL_CATEGORIES": "All categories",
     "ADD": "Add",
     "PREVIEW": "Preview",
-    "FAVORITE": "Add to favorites"
+    "FAVORITE": "Add to favorites",
+    "UNFAVORITE": "Remove from favorites",
+    "DESCRIPTIONS": {
+      "STANDALONE": "Modern standalone component",
+      "SMART": "Component with business logic",
+      "PRESENTATIONAL": "Pure presentation component",
+      "SIGNAL": "Component with Signals",
+      "LAYOUT": "Layout component",
+      "FEATURE": "Feature component",
+      "INJECTABLE": "Injectable service",
+      "HTTP": "HTTP service",
+      "FACADE": "Facade service",
+      "REPOSITORY": "Repository service",
+      "UTILITY": "Utility service",
+      "ROUTE": "Angular route",
+      "CHILD_ROUTE": "Child route",
+      "LAZY_ROUTE": "Lazy-loaded route",
+      "GUARD": "Route guard",
+      "RESOLVER": "Route resolver",
+      "OUTLET": "Router outlet",
+      "SIGNAL": "Angular signal",
+      "COMPUTED_SIGNAL": "Computed signal",
+      "SUBJECT": "RxJS Subject",
+      "NGRX_STORE": "NgRx Store",
+      "MATERIAL_CARD": "Material card",
+      "MODULE": "Angular module",
+      "MICRO_FRONTEND": "Micro frontend",
+      "REST_API": "REST API",
+      "DATABASE": "Database",
+      "DEVOPS": "DevOps pipeline"
+    }
+  },
+  "TEMPLATES": {
+    "TITLE": "🏗️ Architecture Templates",
+    "GENERATE": "Generate",
+    "COMPONENTS_INCLUDED": "Components included",
+    "DESCRIPTIONS": {
+      "ECOMMERCE": "Complete e-commerce architecture with cart, catalog and payment",
+      "DASHBOARD": "Analytics dashboard architecture with real-time data visualization",
+      "MICRO_FRONTEND": "Micro-frontend architecture with Module Federation",
+      "REACTIVE_FORMS": "Architecture for complex reactive forms",
+      "REAL_TIME": "Real-time architecture with WebSocket and RxJS"
+    }
   },
   "PREVIEW": {
     "TITLE": "👁️ Preview",
     "TYPE": "Type",
     "SINGLE_ELEMENT": "Single element",
+    "MULTIPLE_ELEMENTS": "Multiple elements",
     "FULL_LIBRARY": "Full library",
     "SELECT_COMPONENT": "Select component",
+    "ZOOM_IN": "Zoom in",
+    "ZOOM_OUT": "Zoom out",
+    "RESET_ZOOM": "Reset zoom",
+    "CENTER": "Center",
+    "EXPORT_PNG": "Export as PNG",
     "NO_CONTENT": "Select a component or generate a library"
   },
   "LIBRARY": {
     "TITLE": "📚 Library",
+    "TOTAL_ELEMENTS": "Total elements",
+    "CATEGORIES": "Categories",
+    "FAVORITES": "Favorites",
+    "FILTER_BY_CATEGORY": "Filter by category",
     "EMPTY": "No library generated. Click Generate to start.",
     "CLEAR": "Clear library",
-    "DELETE": "Delete"
+    "DELETE": "Delete",
+    "CONFIRM_CLEAR": "Are you sure you want to clear the library?"
   },
   "EXPORT": {
     "TITLE": "💾 Export Library",
     "FILENAME": "File name",
+    "FORMATS_TITLE": "Available formats:",
     "DOWNLOAD_EXCALIDRAW": "Download .excalidrawlib",
     "EXPORT_SVG": "Export as SVG",
     "EXPORT_PDF": "Export as PDF",
+    "EXPORT_GROUP_SVG": "Export group as SVG",
+    "EXPORT_PREVIEW_PDF": "Export preview as PDF",
     "COPY_JSON": "Copy JSON"
   },
+  "STATISTICS": {
+    "TITLE": "📊 Library Statistics",
+    "TOTAL_COMPONENTS": "Total components",
+    "TOTAL_CATEGORIES": "Categories",
+    "TOTAL_ELEMENTS": "Graphic elements",
+    "BY_CATEGORY": "Distribution by category",
+    "NO_DATA": "No library generated",
+    "NO_DATA_DESC": "Click \"Generate\" to create components"
+  },
   "MESSAGES": {
-    "LIBRARY_GENERATED": "Library generated successfully",
-    "LINK_COPIED": "Link copied to clipboard",
-    "THEME_CHANGED": "Theme changed",
-    "COMPONENT_ADDED": "Component added",
-    "LIBRARY_CLEARED": "Library cleared"
+    "LIBRARY_GENERATED": "✅ Library generated successfully",
+    "FULL_LIBRARY_GENERATED": "✅ Complete library generated",
+    "TEMPLATE_GENERATED": "✅ Template \"{{name}}\" generated",
+    "COMPONENT_ADDED": "✅ {{name}} added to library",
+    "COMPONENT_REMOVED": "🗑️ Component removed",
+    "LIBRARY_CLEARED": "🗑️ Library cleared",
+    "EXPORT_SUCCESS": "✅ Export successful",
+    "EXPORT_ERROR": "❌ Export error",
+    "IMPORT_SUCCESS": "✅ Library imported: {{count}} elements",
+    "IMPORT_ERROR": "❌ Import error",
+    "LINK_COPIED": "✅ Link copied to clipboard",
+    "JSON_COPIED": "✅ JSON copied to clipboard",
+    "THEME_CHANGED": "🌓 Theme: {{theme}}",
+    "LANGUAGE_CHANGED": "🌍 Language: {{language}}",
+    "SAVED": "💾 Library saved",
+    "PREVIEW_SUCCESS": "👁️ Preview: {{name}}",
+    "PREVIEW_ERROR": "❌ Preview error",
+    "ADD_ERROR": "❌ Error adding component",
+    "NO_LIBRARY": "❌ No library to export",
+    "NO_COMPONENT": "❌ No component selected"
+  },
+  "THEME": {
+    "DARK": "Dark",
+    "LIGHT": "Light"
+  },
+  "LANGUAGE": {
+    "ENGLISH": "English",
+    "FRENCH": "French"
+  },
+
+   "DOCS": {
+    "TITLE": "📚 Documentation",
+    "SUBTITLE": "Complete guide to using Angular Architecture Kit",
+    "INTRODUCTION": {
+      "TITLE": "Introduction",
+      "WELCOME": "Welcome to Angular Architecture Kit",
+      "DESCRIPTION": "This application allows you to easily create Angular architecture diagrams for your projects.",
+      "FEATURES_TITLE": "Features:",
+      "FEATURE_1": "Angular component generation",
+      "FEATURE_2": "Real-time preview",
+      "FEATURE_3": "Predefined architecture templates",
+      "FEATURE_4": "Export to Excalidraw",
+      "FEATURE_5": "Automatic save",
+      "FEATURE_6": "Dark mode",
+      "FEATURE_7": "Keyboard shortcuts"
+    },
+    "QUICK_START": {
+      "TITLE": "Quick Start Guide",
+      "STEP_1": "Click \"Generate\" to create a basic library",
+      "STEP_2": "Browse components in the \"Components\" tab",
+      "STEP_3": "Add components with the \"Add\" button",
+      "STEP_4": "Preview in the \"Preview\" tab",
+      "STEP_5": "Export your library",
+      "CUSTOMIZATION_TITLE": "Customization",
+      "CUSTOMIZATION_1": "Use search to find components",
+      "CUSTOMIZATION_2": "Filter by category",
+      "CUSTOMIZATION_3": "Add favorites with the star ⭐",
+      "CUSTOMIZATION_4": "Generate complete templates"
+    },
+    "SHORTCUTS": {
+      "TITLE": "Keyboard Shortcuts",
+      "GENERATE": "Generate library",
+      "EXPORT": "Open export dialog",
+      "SAVE": "Save library",
+      "EXPORT_PDF": "Export as PDF",
+      "EXPORT_SVG": "Export as SVG",
+      "COPY_LINK": "Copy share link",
+      "OPEN_DOCS": "Open documentation"
+    },
+    "API_REFERENCE": {
+      "TITLE": "API Reference",
+      "LIBRARY_SERVICE": "LibraryGeneratorService",
+      "LIBRARY_SERVICE_DESC": "Main service for library generation.",
+      "METHODS_TITLE": "Main methods:",
+      "METHOD_1": "generateLibrary() - Generates the base library",
+      "METHOD_2": "generateFullLibrary() - Generates all components",
+      "METHOD_3": "generateArchitectureTemplate(name) - Generates a specific template",
+      "METHOD_4": "addComponentToLibrary(type) - Adds a component",
+      "METHOD_5": "removeComponentFromLibrary(id) - Removes a component",
+      "METHOD_6": "exportLibrary() - Exports to JSON",
+      "METHOD_7": "downloadLibrary(filename) - Downloads the file",
+      "CANVAS_SERVICE": "CanvasRendererService",
+      "CANVAS_SERVICE_DESC": "Service for rendering elements on canvas.",
+      "FILE_SERVICE": "FileExportService",
+      "FILE_SERVICE_DESC": "Service for file export/import."
+    },
+    "TROUBLESHOOTING": {
+      "TITLE": "Troubleshooting",
+      "PROBLEM_1_TITLE": "Components don't appear in Excalidraw",
+      "PROBLEM_1_SOLUTION": "Make sure you import the .excalidrawlib file correctly.",
+      "PROBLEM_2_TITLE": "Preview is empty",
+      "PROBLEM_2_SOLUTION": "Click \"Generate\" or \"Add\" to create components.",
+      "PROBLEM_3_TITLE": "Zoom doesn't work",
+      "PROBLEM_3_SOLUTION": "Use the mouse wheel or zoom buttons."
+    }
   }
 }

@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1787177222295,
+  "timestamp": 1787249806369,
   "index": "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/index.html",
   "assetGroups": [
     {
@@ -26,7 +26,7 @@
         "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/chunk-WFALYY7V.js",
         "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/chunk-WWTHOZRW.js",
         "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/index.html",
-        "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/main-TFEHKG6J.js",
+        "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/main-2F6Q2KGR.js",
         "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/polyfills-RV3JTMEC.js",
         "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/styles-4K6CHSR7.css"
       ],
@@ -59,8 +59,8 @@
     "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/chunk-T42CINRN.js": "ee87f0c390191b7035bcc9510718c3f538756e71",
     "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/chunk-WFALYY7V.js": "de41aea2ab0afa4130bd4f355a043222372ffa1b",
     "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/chunk-WWTHOZRW.js": "a30df8c514619da51c89ee19450d59c6e818c3e6",
-    "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/index.html": "e6df3e7f1d93620a1e2f50dc37b58ca7e9ce702d",
-    "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/main-TFEHKG6J.js": "a86325e37daf3fb7be018187ffdf4822060ca1f6",
+    "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/index.html": "bc843f2270649830f76f8764d71747768b5cf0de",
+    "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/main-2F6Q2KGR.js": "d905d84a9ecad52410325f5545e398939eae7236",
     "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/polyfills-RV3JTMEC.js": "e83dcd401293cfb45ad0988a17d1815b3bb09c33",
     "https://abdelwaheb-net.github.io/angular-architecture-design-system-kit/styles-4K6CHSR7.css": "080983c03435adf76bb4d561deb3b6d4512a8a97"
   },
