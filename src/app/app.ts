@@ -83,9 +83,16 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
         <span class="logo">🚀 Angular Architecture Kit</span>
         <span class="spacer"></span>
         <!-- Bouton de langue -->
-        <button mat-icon-button (click)="toggleLanguage()">
+        <button
+          mat-icon-button
+          matTooltip="Language"
+          (click)="toggleLanguage()"
+          class="language-button"
+        >
           <mat-icon>language</mat-icon>
-          <span>{{ languageService.currentLanguage() | uppercase }}</span>
+          <span class="language-indicator">{{
+            languageService.currentLanguage() | uppercase
+          }}</span>
         </button>
 
         <!-- Utiliser le pipe -->
@@ -176,7 +183,7 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="category-field">
-                  <mat-label>Catégorie</mat-label>
+                  <mat-label>{{ 'COMPONENTS.Category' | t }}</mat-label>
                   <mat-select [(ngModel)]="selectedFilterCategory">
                     <mat-option value="all">{{ 'COMPONENTS.ALL_CATEGORIES' | t }}</mat-option>
                     <mat-option value="Components">Components</mat-option>
@@ -197,7 +204,9 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
                         <span class="component-icon">{{ component.icon }}</span>
                         {{ component.defaultName }}
                       </mat-card-title>
-                      <mat-card-subtitle>{{ component.description }}</mat-card-subtitle>
+                      <mat-card-subtitle>{{
+                        getComponentDescription(component.type)
+                      }}</mat-card-subtitle>
                     </mat-card-header>
 
                     <mat-card-content>
@@ -221,7 +230,7 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
           <!-- Onglet Templates -->
           <mat-tab label="{{ 'TABS.TEMPLATES' | t }}">
             <div class="tab-content">
-              <h2>🏗️ Templates d'architecture</h2>
+              <h2>{{ 'TEMPLATES.TITLE' | t }}</h2>
 
               <div class="templates-grid">
                 @for (template of architectureTemplates; track template.id) {
@@ -539,6 +548,9 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
         font-size: 0.7rem;
         font-weight: bold;
         margin-left: 2px;
+      }
+      .language-button {
+        margin-right: 16px; /* Décale le bouton vers la gauche */
       }
     `,
   ],
@@ -1126,6 +1138,33 @@ export class AppComponent implements OnInit {
 
   private tp(key: string, params: Record<string, string>): string {
     return this.languageService.translateWithParams(key, params);
+  }
+  getTemplateDescription(templateId: string): string {
+    const key = `TEMPLATES.DESCRIPTIONS.${templateId.toUpperCase().replace(/-/g, '_')}`;
+    return this.languageService.translate(key);
+  }
+  getComponentDescription(type: ComponentType): string {
+    // Mapper le type vers une clé de traduction
+    const descriptionKey = this.getDescriptionKey(type);
+    return this.languageService.translate(`COMPONENTS.DESCRIPTIONS.${descriptionKey}`);
+  }
+
+  private getDescriptionKey(type: ComponentType): string {
+    const keyMap: Record<string, string> = {
+      [ComponentType.STANDALONE_COMPONENT]: 'STANDALONE',
+      [ComponentType.SMART_COMPONENT]: 'SMART',
+      [ComponentType.PRESENTATIONAL_COMPONENT]: 'PRESENTATIONAL',
+      [ComponentType.SIGNAL_COMPONENT]: 'SIGNAL',
+      [ComponentType.INJECTABLE_SERVICE]: 'INJECTABLE',
+      [ComponentType.HTTP_SERVICE]: 'HTTP',
+      [ComponentType.ROUTE_NODE]: 'ROUTE',
+      [ComponentType.ROUTE_GUARD]: 'GUARD',
+      [ComponentType.SIGNAL]: 'SIGNAL',
+      [ComponentType.NGRX_STORE]: 'NGRX_STORE',
+      [ComponentType.DEVOPS_PIPELINE]: 'DEVOPS',
+    };
+
+    return keyMap[type] || 'STANDALONE';
   }
 }
 export { AppComponent as App };
